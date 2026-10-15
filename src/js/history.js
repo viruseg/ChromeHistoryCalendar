@@ -109,23 +109,29 @@ $(document).ready(function() {
         document.body.scrollTop = 0;
     }, 200);
 
-    calendar = new createCalendarObj('calendar', date.getFullYear(), date.getMonth(), true, true, function() {
-        var dateObj = calendar.getDateSelect();
-        tempDay = dateObj.day;
-        tempMonth = dateObj.month-1;
-        tempYear = dateObj.year;
-        searchText.val('');
-        clearText.addClass('hide');
+    calendar = new Calendar({
+        target: '#calendar',
+        view: { year: date.getFullYear(), month: date.getMonth() },
+        weekStartsOnMonday: true,
+        showInfoBar: true,
+        onSelect: function() {
+            var dateObj = calendar.getDateSelect();
+            tempDay = dateObj.day;
+            tempMonth = dateObj.month-1;
+            tempYear = dateObj.year;
+            searchText.val('');
+            clearText.addClass('hide');
 
-        globalDay = tempDay;
-        globalMonth = tempMonth;
-        globalYear = tempYear;
+            globalDay = tempDay;
+            globalMonth = tempMonth;
+            globalYear = tempYear;
 
-        mainMode = true;
+            mainMode = true;
 
-        hideAll();
+            hideAll();
 
-        getArrHistoryDay(tempDay, tempMonth, tempYear, '', true, false);
+            getArrHistoryDay(tempDay, tempMonth, tempYear, '', true, false);
+        }
     });
 
     calendar.setDateSelect( date.getFullYear(), date.getMonth(), date.getDate() );
@@ -135,7 +141,12 @@ $(document).ready(function() {
         firstMonday = true;
     }
 
-    calendar.changeLanguage(month2, month, week2, week, chrome.i18n.getMessage("complete"), firstMonday);
+    calendar.setLocale({
+        months: { nominative: month2, genitive: month },
+        weekdays: { short: week2, full: week },
+        completeText: chrome.i18n.getMessage("complete"),
+        weekStartsOnMonday: firstMonday
+    });
 
     historyUrl.click(function() {
         hideAll();
@@ -678,8 +689,19 @@ function initInterval() {
     var timeStart = new Date();
     timeStart.setDate( timeStart.getDate() - 7 );
 
-    calendarStart = new createCalendarObj('calendarStart', timeStart.getFullYear(), timeStart.getMonth(), true, false);
-    calendarEnd = new createCalendarObj('calendarEnd', date.getFullYear(), date.getMonth(), true, false);
+    calendarStart = new Calendar({
+        target: '#calendarStart',
+        view: { year: timeStart.getFullYear(), month: timeStart.getMonth() },
+        weekStartsOnMonday: true,
+        showInfoBar: false
+    });
+
+    calendarEnd = new Calendar({
+        target: '#calendarEnd',
+        view: { year: date.getFullYear(), month: date.getMonth() },
+        weekStartsOnMonday: true,
+        showInfoBar: false
+    });
 
     calendarStart.setDateSelect( timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate() );
     calendarEnd.setDateSelect( date.getFullYear(), date.getMonth(), date.getDate() );
@@ -689,9 +711,16 @@ function initInterval() {
         firstMonday = true;
     }
 
-    calendar.changeLanguage(month2, month, week2, week, chrome.i18n.getMessage("complete"), firstMonday);
-    calendarStart.changeLanguage(month2, month, week2, week, chrome.i18n.getMessage("complete"), firstMonday);
-    calendarEnd.changeLanguage(month2, month, week2, week, chrome.i18n.getMessage("complete"), firstMonday);
+    var locale = {
+        months: { nominative: month2, genitive: month },
+        weekdays: { short: week2, full: week },
+        completeText: chrome.i18n.getMessage("complete"),
+        weekStartsOnMonday: firstMonday
+    };
+
+    calendar.setLocale(locale);
+    calendarStart.setLocale(locale);
+    calendarEnd.setLocale(locale);
 
     interval = true;
 }
