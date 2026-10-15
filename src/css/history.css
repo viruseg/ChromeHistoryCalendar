@@ -282,6 +282,7 @@ input[disabled] {
 }
 
 #blackListBlock textarea {
+    box-sizing: border-box;
     width: 350px;
     height: 233px;
 }
