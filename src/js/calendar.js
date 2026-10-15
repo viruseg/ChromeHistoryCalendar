@@ -126,7 +126,7 @@ class Calendar {
         this.#showInfoBar = showInfoBar;
         this.#onSelect = onSelect ?? null;
         this.#onFocus = onFocus ?? null;
-        this.#locale = Calendar.#mergeLocale(locale);
+        this.#locale = Calendar.#mergeLocale(locale, Calendar.#defaults());
         this.#selected = { year: 0, month: 0, day: 0 };
         this.#year = view.year;
         this.#month = view.month;
@@ -202,19 +202,19 @@ class Calendar {
     }
 
     /**
-     * Replaces the language and re-draws. `weekStartsOnMonday` rides along with the
-     * arrays because the extension only ever settles the week start here, never in the
-     * constructor.
+     * Applies `locale` and re-draws. Every field is optional, and an absent one keeps the
+     * value this instance already holds. `weekStartsOnMonday` rides along with the arrays
+     * because the extension settles the week start only here, never in the constructor.
      *
      * @param {{
      *     months?: {nominative: string[], genitive: string[]},
      *     weekdays?: {short: string[], full: string[]},
      *     completeText?: string,
      *     weekStartsOnMonday?: boolean
-     * }} locale every field is optional; an absent one keeps the current value for it
+     * }} locale
      */
     setLocale(locale) {
-        this.#locale = Calendar.#mergeLocale(locale);
+        this.#locale = Calendar.#mergeLocale(locale, this.#locale);
         this.#weekStartsOnMonday = locale?.weekStartsOnMonday ?? this.#weekStartsOnMonday;
         this.#render();
     }
@@ -269,16 +269,49 @@ class Calendar {
     }
 
     /**
-     * @param {Object|undefined} locale partial locale; absent fields keep the built-in
-     *     Russian Monday-first defaults rather than falling back to `Intl`, whose output
-     *     would differ from them in the very first render
-     * @returns {{months: Object, weekdays: Object, completeText: string}} a complete locale
+     * @returns {{
+     *     months: {nominative: string[], genitive: string[]},
+     *     weekdays: {short: string[], full: string[]},
+     *     completeText: string
+     * }} the built-in Russian Monday-first locale. These are the constructor's starting
+     *     point rather than `Intl`, whose output would differ from them in the very first
+     *     render
      */
-    static #mergeLocale(locale) {
+    static #defaults() {
         return {
-            months: locale?.months ?? Calendar.DEFAULT_MONTHS,
-            weekdays: locale?.weekdays ?? Calendar.DEFAULT_WEEKDAYS,
-            completeText: locale?.completeText ?? Calendar.DEFAULT_COMPLETE_TEXT
+            months: Calendar.DEFAULT_MONTHS,
+            weekdays: Calendar.DEFAULT_WEEKDAYS,
+            completeText: Calendar.DEFAULT_COMPLETE_TEXT
+        };
+    }
+
+    /**
+     * Merging against the caller's `base` rather than the static defaults is what keeps
+     * `setLocale` internally consistent: omitted arrays would otherwise revert to Russian
+     * while the week start kept its old value, assembling a mixed-language calendar out of
+     * a single call.
+     *
+     * @param {{
+     *     months?: {nominative: string[], genitive: string[]},
+     *     weekdays?: {short: string[], full: string[]},
+     *     completeText?: string
+     * }} locale
+     * @param {{
+     *     months: {nominative: string[], genitive: string[]},
+     *     weekdays: {short: string[], full: string[]},
+     *     completeText: string
+     * }} base complete locale the absent fields are taken from
+     * @returns {{
+     *     months: {nominative: string[], genitive: string[]},
+     *     weekdays: {short: string[], full: string[]},
+     *     completeText: string
+     * }} a complete locale
+     */
+    static #mergeLocale(locale, base) {
+        return {
+            months: locale?.months ?? base.months,
+            weekdays: locale?.weekdays ?? base.weekdays,
+            completeText: locale?.completeText ?? base.completeText
         };
     }
 
