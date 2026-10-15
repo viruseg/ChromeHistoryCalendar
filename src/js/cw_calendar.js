@@ -340,6 +340,7 @@ function createCalendarObj(id, year, month, firstDayMondey, showInfoBar, onSelec
                         dayNum++;
 
                         elem = document.createElement('td');
+                        var dateCurrent = new Date(year, month, dayNum);
 
                         //Ячейки с числами текущего месяца
                         if (oneForwardShift==false && (dayNum > 0) && (dayNum <= dayCount)) {
@@ -348,13 +349,12 @@ function createCalendarObj(id, year, month, firstDayMondey, showInfoBar, onSelec
                         }
 
                         //Подсветка текущей даты
-                        if ( year == now.getFullYear() && month == now.getMonth() && dayNum == now.getDate() ) {
+                        if ( dateCurrent.getFullYear() == now.getFullYear() && dateCurrent.getMonth() == now.getMonth() && dateCurrent.getDate() == now.getDate() ) {
                             elem.className += ' cw___now';
                         }
 
                         //Подсветка выделенной даты
                         var dateSel = new Date(this.calendarVar.selected.year, this.calendarVar.selected.month, this.calendarVar.selected.day);
-                        var dateCurrent = new Date(year, month, dayNum);
                         if ( dateCurrent.getFullYear() == dateSel.getFullYear() && dateCurrent.getMonth() == dateSel.getMonth() && dateCurrent.getDate() == dateSel.getDate() ) {
                             elem.className += ' cw___selected';
                         }
@@ -383,7 +383,7 @@ function createCalendarObj(id, year, month, firstDayMondey, showInfoBar, onSelec
             if ( this.calendarVar.tag == 'input' ) {
                 var buttonComplete = document.createElement('div');
                 buttonComplete.id = 'cw___buttonComplete';
-                buttonComplete.textContent = 'готово';
+                buttonComplete.textContent = this.calendarVar.completeText;
                 bodyCW.appendChild(buttonComplete);
             }
 

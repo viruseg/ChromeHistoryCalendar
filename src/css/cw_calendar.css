@@ -60,6 +60,7 @@ div#cw___calendarWin {
     -ms-user-select: none;
     user-select: none;
     width: 26em;
+    min-width: max-content;
     font-family: sans-serif;
     position: relative;
 }
