@@ -8,6 +8,24 @@ Manifest V3. No background scripts or service worker — everything lives in `hi
 
 User settings (the blocklist) live in `localStorage` under the `chrome-extension://<id>` origin and survive extension updates.
 
+## Regression check for the calendar grid
+
+```bash
+node tools/check-calendar-grid.mjs          # from the repository root, no dependencies
+node tools/check-calendar-grid.mjs <path>   # same check against another calendar.js copy
+```
+
+Loads `src/js/calendar.js` into a `node:vm` context with a minimal DOM stub, drives a real `Calendar`
+through a matrix of months, week orientations and mount modes, and asserts the grid invariants on
+every render: 8 `<tr>`, 42 day cells of 7 per row, `cw___day` membership against the real length of
+the drawn month, spill cells genuinely outside it, and `data-date` values that normalise to real
+dates. Each case is inspected twice — as the constructor renders it, and after a day click has been
+dispatched through the delegated handler. Exits non-zero on any failure.
+
+Run it after touching `src/js/calendar.js`. It is deliberately expected to fail on the string month
+`#selectDay` leaves behind (`this.#month = String(month)` makes `this.#month + 1` string
+concatenation); that fix is tracked separately.
+
 ## Debugging via MCP
 
 The `chrome-devtools` server is already configured globally in `~/.config/opencode/opencode.jsonc`:
