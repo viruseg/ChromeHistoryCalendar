@@ -1,4 +1,4 @@
-div#cw___calendarWin, div#cw___calendarWin>table, div#cw___blockMonth, div.cw___monthControl {
+.cw___calendar, .cw___calendar>table, .cw___picker--month, div.cw___monthControl {
     font-size: 12px;
 }
 
@@ -8,16 +8,16 @@ div#cw___calendarWin, div#cw___calendarWin>table, div#cw___blockMonth, div.cw___
     top: 0;
 }
 
-#cw___calendarWin .cw___hide, .cw___hide {
+.cw___calendar .cw___hide, .cw___hide {
     display: none;
 }
 
-#cw___calendarWin #cw___infobar {
+.cw___calendar .cw___infobar {
     height: 15.7em;
     z-index: 1;
 }
 
-#cw___calendarWin #cw___infobarWeek, #cw___calendarWin #cw___infobarMonth, #cw___calendarWin #cw___infobarDay, #cw___calendarWin #cw___infobarYear {
+.cw___calendar .cw___infobarWeek, .cw___calendar .cw___infobarMonth, .cw___calendar .cw___infobarDay, .cw___calendar .cw___infobarYear {
     background-color: rgb(153, 153, 153);
     text-align: center;
     color: white;
@@ -25,35 +25,35 @@ div#cw___calendarWin, div#cw___calendarWin>table, div#cw___blockMonth, div.cw___
     font-variant: small-caps;
 }
 
-#cw___calendarWin #cw___infobarMonth, #cw___calendarWin #cw___infobarDay, #cw___calendarWin #cw___infobarYear {
+.cw___calendar .cw___infobarMonth, .cw___calendar .cw___infobarDay, .cw___calendar .cw___infobarYear {
     background-color: white;
     color: rgb(51, 181, 229);
     font-size: 3em;
 }
 
-#cw___calendarWin #cw___infobarWeek {
+.cw___calendar .cw___infobarWeek {
     padding-bottom: .2em;
 }
 
-#cw___calendarWin #cw___infobarMonth {
+.cw___calendar .cw___infobarMonth {
     padding-top: .3em;
 }
 
-#cw___calendarWin #cw___infobarDay {
+.cw___calendar .cw___infobarDay {
     font-size: 5em;
 }
 
-#cw___calendarWin #cw___infobarYear {
+.cw___calendar .cw___infobarYear {
     font-size: 2em;
     color: rgb(153, 153, 153);
     padding-bottom: .7em;
 }
 
-#cw___calendarWin.cw___shadow {
+.cw___calendar.cw___shadow {
     box-shadow: 4px 4px 24px 0px rgba(0,0,0,0.75);
 }
 
-div#cw___calendarWin {
+.cw___calendar {
     background-color: rgb(242, 242, 242);
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -65,18 +65,18 @@ div#cw___calendarWin {
     position: relative;
 }
 
-#cw___calendarWin table {
+.cw___calendar table {
     border-collapse: collapse;
     table-layout: fixed;
     margin: 1.5em auto 0;
     z-index: 1;
 }
 
-#cw___calendarWin tr:nth-child(2) {
+.cw___calendar tr:nth-child(2) {
     border-bottom: .1em rgb(205, 205, 205) solid;
 }
 
-#cw___calendarWin td, #cw___calendarWin th {
+.cw___calendar td, .cw___calendar th {
     padding: 1em;
     font-size: 1.1em;
     line-height: 1.1em;
@@ -86,25 +86,25 @@ div#cw___calendarWin {
     color: rgb(153, 153, 153);
 }
 
-#cw___calendarWin td {
+.cw___calendar td {
     font-variant: small-caps;
 }
 
-#cw___calendarWin .cw___day {
+.cw___calendar .cw___day {
     color: black;
 }
 
-#cw___calendarWin .cw___active, #cw___calendarWin .cw___buttonJump {
+.cw___calendar .cw___active, .cw___calendar .cw___buttonJump {
     position: relative;
 }
 
-#cw___calendarWin .cw___buttonJump {
+.cw___calendar .cw___buttonJump {
     font-size: 1em;
 }
 
-#cw___calendarWin .cw___active:hover:before, #cw___calendarWin .cw___selected:before, #cw___calendarWin .cw___buttonJump:hover:before,
-#cw___calendarWin .cw___selectedMonth:before, #cw___calendarWin .cw___monthButton:hover:before,
-#cw___calendarWin .cw___selectedYear:before, #cw___calendarWin .cw___yearButton:hover:before{
+.cw___calendar .cw___active:hover:before, .cw___calendar .cw___selected:before, .cw___calendar .cw___buttonJump:hover:before,
+.cw___calendar .cw___selectedMonth:before, .cw___calendar .cw___monthButton:hover:before,
+.cw___calendar .cw___selectedYear:before, .cw___calendar .cw___yearButton:hover:before{
     content: '';
     width: 2.3em;
     height: 2.3em;
@@ -115,20 +115,20 @@ div#cw___calendarWin {
     border-radius: 5em;
 }
 
-#cw___calendarWin .cw___active, #cw___calendarWin .cw___buttonJump {
+.cw___calendar .cw___active, .cw___calendar .cw___buttonJump {
     cursor: pointer;
 }
 
-#cw___calendarWin .cw___buttonJump:hover:before {
+.cw___calendar .cw___buttonJump:hover:before {
     left: -.4em;
     top: -.55em;
 }
 
-#cw___calendarWin .cw___now, #cw___calendarWin .cw___selectedMonth:before, #cw___calendarWin .cw___selectedYear:before {
+.cw___calendar .cw___now, .cw___calendar .cw___selectedMonth:before, .cw___calendar .cw___selectedYear:before {
     color: rgb(51, 181, 229);
 }
 
-#cw___calendarWin #cw___buttonComplete {
+.cw___calendar .cw___buttonComplete {
     text-align: center;
     color: black;
     font-size: 1.5em;
@@ -139,11 +139,11 @@ div#cw___calendarWin {
     cursor: pointer;
 }
 
-#cw___calendarWin #cw___buttonComplete:hover {
+.cw___calendar .cw___buttonComplete:hover {
     color: rgb(51, 181, 229);
 }
 
-#cw___calendarWin .cw___blockMonth {
+.cw___calendar .cw___picker {
     width: 26em;
     position: absolute;
     bottom: 0;
@@ -153,20 +153,20 @@ div#cw___calendarWin {
     display: none;
 }
 
-#cw___calendarWin .cw___blockMonthMargin {
+.cw___calendar .cw___picker--offset {
     margin-bottom: 3.4em;
 }
 
-#cw___calendarWin .cw___monthControl {
+.cw___calendar .cw___monthControl {
     height: 3.7em;
     line-height: 3.7em;
 }
 
-#cw___calendarWin .cw___monthControl div {
+.cw___calendar .cw___monthControl div {
     float: left;
 }
 
-#cw___calendarWin .cw___buttonJump2 {
+.cw___calendar .cw___buttonJump2 {
     width: 3.3em!important;
     text-align: center;
     margin-top: -0.2em;
@@ -175,7 +175,7 @@ div#cw___calendarWin {
     margin-left: .1em;
 }
 
-#cw___calendarWin .cw___buttonCentr {
+.cw___calendar .cw___buttonCentr {
     width: 14.2em;
     font-size: 1.3em;
     text-align: center;
@@ -184,7 +184,7 @@ div#cw___calendarWin {
     font-weight: bold;
 }
 
-#cw___calendarWin .cw___buttonJump2:hover:before {
+.cw___calendar .cw___buttonJump2:hover:before {
     left: .4em;
     top: .55em;
 }
@@ -202,11 +202,11 @@ div#cw___calendarWin {
     -webkit-padding-after: .55em;
 }
 
-#cw___calendarWin .cw___yearButton {
+.cw___calendar .cw___yearButton {
     width: 4.2em;
 }
 
-#cw___calendarWin .cw___selectedMonth:before, #cw___calendarWin .cw___monthButton:hover:before {
+.cw___calendar .cw___selectedMonth:before, .cw___calendar .cw___monthButton:hover:before {
     border-radius: 0.3em;
     width: 6.7em;
     height: 1.7em;
@@ -214,7 +214,7 @@ div#cw___calendarWin {
     left: 0;
 }
 
-#cw___calendarWin .cw___selectedYear:before, #cw___calendarWin .cw___yearButton:hover:before {
+.cw___calendar .cw___selectedYear:before, .cw___calendar .cw___yearButton:hover:before {
     border-radius: .3em;
     width: 4.2em;
     height: 1.7em;
@@ -222,10 +222,14 @@ div#cw___calendarWin {
     left: 0;
 }
 
-#cw___calendarWin #cw___captionYear, #cw___calendarWin #cw___captionMonth, #cw___calendarWin #cw___monthChange {
+.cw___calendar .cw___captionYear, .cw___calendar .cw___captionMonth, .cw___calendar .cw___monthChange {
     cursor: pointer;
 }
 
-#cw___calendarWin #cw___captionYear:hover, #cw___calendarWin #cw___captionMonth:hover, #cw___calendarWin #cw___monthChange:hover {
+.cw___calendar .cw___captionYear:hover, .cw___calendar .cw___captionMonth:hover, .cw___calendar .cw___monthChange:hover {
     color: rgb(51, 181, 229);
+}
+
+.cw___calendar .cw___picker--open {
+    display: block;
 }
