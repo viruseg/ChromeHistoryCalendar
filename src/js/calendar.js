@@ -253,7 +253,7 @@ class Calendar {
             throw new TypeError('calendar target not found');
         }
         if (element.tagName !== 'INPUT' && element.tagName !== 'DIV') {
-            throw new TypeError('calendar target must be a div or an input, got ' + element.tagName);
+            throw new TypeError(`calendar target must be a div or an input, got ${element.tagName}`);
         }
 
         return element;
@@ -302,8 +302,8 @@ class Calendar {
     }
 
     /**
-     * @param {EventTarget} element node the handler is attached to; kept so that
-     *     `destroy()` can undo the attachment later
+     * @param {EventTarget} element node the handler goes on; kept in the ledger so that
+     *     `destroy()` can take it off again
      * @param {string} type DOM event name
      * @param {EventListener} handler
      */
@@ -363,7 +363,7 @@ class Calendar {
         });
     }
 
-    /** @param {boolean} visible whether the popup should be on screen; a no-op inline */
+    /** @param {boolean} visible a no-op inline, where there is no wrapper to show */
     #setVisible(visible) {
         this.#wrapper?.classList.toggle('cw___hide', !visible);
     }
@@ -388,8 +388,8 @@ class Calendar {
             'borderRightWidth', 'marginLeft', 'marginRight']
             .reduce((sum, property) => sum + parseFloat(style[property]), 0);
 
-        this.#wrapper.style.left = (box.left + globalThis.scrollX + width + 1) + 'px';
-        this.#wrapper.style.top = (box.top + globalThis.scrollY) + 'px';
+        this.#wrapper.style.left = `${box.left + globalThis.scrollX + width + 1}px`;
+        this.#wrapper.style.top = `${box.top + globalThis.scrollY}px`;
     }
 
     /**
@@ -507,7 +507,7 @@ class Calendar {
 
         this.#root.querySelector('.cw___captionMonth').textContent = String(pivot);
         this.#root.querySelector('.cw___captionYear').textContent =
-            (pivot - PICKER_YEARS_BEFORE) + ' — ' + (pivot + PICKER_YEARS_AFTER);
+            `${pivot - PICKER_YEARS_BEFORE} — ${pivot + PICKER_YEARS_AFTER}`;
 
         for (const button of this.#root.querySelectorAll('.cw___monthButton')) {
             const month = Number(button.getAttribute('data-month'));
@@ -650,8 +650,9 @@ class Calendar {
     }
 
     /**
-     * @returns {HTMLDivElement} the wrapper holding infobar, table, the complete button and
-     *     the two pickers, in that order
+     * @returns {HTMLDivElement} the calendar root. Child order is positional and load
+     *     bearing: the pickers are the last two children, and the complete button only
+     *     exists in a popup, between the table and them.
      */
     #buildCalendar() {
         const calendar = document.createElement('div');
@@ -785,7 +786,7 @@ class Calendar {
                        edges, so the cell stores the date it actually displays. */
                     cell.setAttribute(
                         'data-date',
-                        current.getFullYear() + '.' + current.getMonth() + '.' + current.getDate()
+                        `${current.getFullYear()}.${current.getMonth()}.${current.getDate()}`
                     );
                     cell.textContent = String(current.getDate());
                 }
@@ -805,7 +806,7 @@ class Calendar {
     }
 
     /**
-     * @param {Date} start first day of the drawn month
+     * @param {Date} start
      * @returns {HTMLTableRowElement} the row carrying the paging arrows and the caption
      */
     #buildArrowRow(start) {
@@ -820,10 +821,7 @@ class Calendar {
         return line;
     }
 
-    /**
-     * @param {string} glyph arrow to draw
-     * @returns {HTMLTableCellElement}
-     */
+    /** @returns {HTMLTableCellElement} the header cell wrapping one paging arrow */
     #buildArrowCell(glyph) {
         const cell = document.createElement('th');
         const button = document.createElement('div');
@@ -835,7 +833,7 @@ class Calendar {
     }
 
     /**
-     * @param {Date} start first day of the drawn month
+     * @param {Date} start
      * @returns {HTMLTableCellElement} the month-and-year caption, spanning the five
      *     weekday columns between the arrows
      */
@@ -843,8 +841,7 @@ class Calendar {
         const cell = document.createElement('th');
         cell.className = 'cw___monthChange';
         cell.setAttribute('colspan', '5');
-        cell.textContent = this.#locale.months.nominative[start.getMonth()]
-            + ' ' + start.getFullYear();
+        cell.textContent = `${this.#locale.months.nominative[start.getMonth()]} ${start.getFullYear()}`;
 
         return cell;
     }
@@ -889,22 +886,22 @@ class Calendar {
     }
 
     /**
-     * @param {string} variant which of the two pickers is being built
+     * @param {string} variant
      * @returns {HTMLDivElement} the picker shell. A popup's pickers are offset upwards, to
      *     clear the complete button that sits below the grid.
      */
     #createPicker(variant) {
         const picker = document.createElement('div');
         picker.className = this.#wrapper
-            ? 'cw___picker ' + variant + ' cw___picker--offset'
-            : 'cw___picker ' + variant;
+            ? `cw___picker ${variant} cw___picker--offset`
+            : `cw___picker ${variant}`;
 
         return picker;
     }
 
     /**
-     * @param {string} captionClass identity class of the caption, which differs between
-     *     the two pickers
+     * @param {string} captionClass identity class of the caption; it differs between the
+     *     two pickers, which is the only thing telling the two overlays apart
      * @returns {HTMLDivElement} the arrows-and-caption row every picker opens with
      */
     #buildPickerControl(captionClass) {
@@ -912,7 +909,7 @@ class Calendar {
         control.className = 'cw___monthControl';
 
         const caption = document.createElement('div');
-        caption.className = 'cw___buttonCentr ' + captionClass;
+        caption.className = `cw___buttonCentr ${captionClass}`;
         caption.textContent = '-';
 
         control.append(
@@ -924,10 +921,7 @@ class Calendar {
         return control;
     }
 
-    /**
-     * @param {string} glyph arrow to draw
-     * @returns {HTMLDivElement}
-     */
+    /** @returns {HTMLDivElement} one of a picker's paging arrows */
     #buildPickerArrow(glyph) {
         const arrow = document.createElement('div');
         arrow.className = 'cw___buttonJump cw___buttonJump2';
@@ -937,11 +931,11 @@ class Calendar {
     }
 
     /**
-     * @param {string} className identity class the picker's buttons are found by
+     * @param {string} className
      * @param {string} attribute name of the attribute carrying the button's own value; it
      *     is what a click reads back, so it is the picker's addressing scheme
-     * @param {number|string} value initial value, stored as text
-     * @param {string} label text the button shows
+     * @param {number|string} value
+     * @param {string} label
      * @returns {HTMLDivElement}
      */
     #buildPickerButton(className, attribute, value, label) {
@@ -955,7 +949,7 @@ class Calendar {
 
     /** Moves the `cw___selected` mark onto whichever cell holds the current selection. */
     #repaintSelected() {
-        const wanted = this.#selected.year + '.' + this.#selected.month + '.' + this.#selected.day;
+        const wanted = `${this.#selected.year}.${this.#selected.month}.${this.#selected.day}`;
 
         for (const cell of this.#root.querySelectorAll('.cw___active')) {
             cell.classList.toggle('cw___selected', cell.getAttribute('data-date') === wanted);
