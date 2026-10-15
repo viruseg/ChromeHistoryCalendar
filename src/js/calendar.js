@@ -70,6 +70,19 @@ class Calendar {
 
         /** @type {string} */
         Calendar.DEFAULT_COMPLETE_TEXT = 'готово';
+
+        /* Frozen all the way down, arrays included: `#defaults()` reads these on every
+           construction, so they are shared by construction and a write reaching them through
+           any one instance would silently change every calendar built afterwards. Freezing
+           turns that mistake into a loud failure at the offending line. No instance ever
+           holds them — `#mergeLocale` hands out copies. */
+        for (const group of [Calendar.DEFAULT_MONTHS, Calendar.DEFAULT_WEEKDAYS]) {
+            for (const names of Object.values(group)) {
+                Object.freeze(names);
+            }
+
+            Object.freeze(group);
+        }
     }
 
     /** @type {HTMLElement} the target the caller named; its own id is left alone */
@@ -283,7 +296,8 @@ class Calendar {
      *     completeText: string
      * }} the built-in Russian Monday-first locale. These are the constructor's starting
      *     point rather than `Intl`, whose output would differ from them in the very first
-     *     render
+     *     render. The statics are handed out as they are and are frozen, so this is only
+     *     safe because the caller — `#mergeLocale`, and nothing else — copies them
      */
     static #defaults() {
         return {
@@ -294,10 +308,44 @@ class Calendar {
     }
 
     /**
+     * A locale an instance can own outright: its own wrapper objects over its own arrays.
+     *
+     * @param {{
+     *     months: {nominative: string[], genitive: string[]},
+     *     weekdays: {short: string[], full: string[]},
+     *     completeText: string
+     * }} locale a complete locale, whose contents this does not retain
+     * @returns {{
+     *     months: {nominative: string[], genitive: string[]},
+     *     weekdays: {short: string[], full: string[]},
+     *     completeText: string
+     * }} a deep copy sharing no mutable object with `locale`
+     */
+    static #copyLocale(locale) {
+        return {
+            months: {
+                nominative: locale.months.nominative.slice(),
+                genitive: locale.months.genitive.slice()
+            },
+            weekdays: {
+                short: locale.weekdays.short.slice(),
+                full: locale.weekdays.full.slice()
+            },
+            completeText: locale.completeText
+        };
+    }
+
+    /**
      * Merging against the caller's `base` rather than the static defaults is what keeps
      * `setLocale` internally consistent: omitted arrays would otherwise revert to Russian
      * while the week start kept its old value, assembling a mixed-language calendar out of
      * a single call.
+     *
+     * The copy is applied to the merged result, which makes this the one place a locale
+     * becomes an instance's state and therefore the one place ownership can be taken. Both
+     * entry points come through here — the constructor against the static defaults, and
+     * `setLocale` against the instance's current locale — so neither the defaults nor a
+     * locale object a caller shares between instances stays reachable afterwards.
      *
      * @param {{
      *     months?: {nominative: string[], genitive: string[]},
@@ -313,14 +361,14 @@ class Calendar {
      *     months: {nominative: string[], genitive: string[]},
      *     weekdays: {short: string[], full: string[]},
      *     completeText: string
-     * }} a complete locale
+     * }} a complete locale, owned by the caller of this method
      */
     static #mergeLocale(locale, base) {
-        return {
+        return Calendar.#copyLocale({
             months: locale?.months ?? base.months,
             weekdays: locale?.weekdays ?? base.weekdays,
             completeText: locale?.completeText ?? base.completeText
-        };
+        });
     }
 
     /**
@@ -590,8 +638,16 @@ class Calendar {
     /**
      * Caption of the month picker, read as "pick a year instead": opens the year overlay,
      * which is drawn against whatever pivot the month overlay has reached so far.
+     *
+     * The update is repeated here rather than inherited from the month overlay, which
+     * normally ran one just before this: a render replaces the root wholesale and leaves
+     * both pickers exactly as `#buildPickerControl` drew them — caption `-`, year buttons
+     * still numbered from 2000, so a click on one would land on year 0. A picker that is
+     * about to become visible has to be told the pivot itself rather than trust the order
+     * in which the paths before it happened to run.
      */
     #openYearPicker() {
+        this.#updatePicker();
         this.#yearPicker().classList.add(PICKER_OPEN);
     }
 
@@ -661,6 +717,13 @@ class Calendar {
         this.#selected.year = year;
         this.#selected.month = month;
         this.#selected.day = day;
+
+        /* Painted on the grid that is already on screen, rather than left to the `#render()`
+           at the end of this method: the callback below is the documented point at which the
+           surrounding page reads this calendar out of the DOM, and that read lands on this
+           root — a caller still holding a node it looked up before the click keeps a live
+           element, with the new mark already on it. The render that follows only turns the
+           page onto the newly selected month. */
         this.#repaintSelected();
 
         /* Numbers, as `.map(Number)` already made them. The legacy click stored the raw
