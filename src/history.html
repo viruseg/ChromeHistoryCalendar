@@ -1,0 +1,119 @@
+<html>
+
+<head>
+    <link rel="icon" href="favicon.png"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <link href="css/history.css" rel="stylesheet" type="text/css" />
+    <link href="css/cw_calendar.css" rel="stylesheet" type="text/css" />
+
+    <script src="js/jquery-2.1.4.min.js" type="text/javascript"></script>
+    <script src="js/cw_calendar.js" type="text/javascript"></script>
+    <script src="js/lib.js" type="text/javascript"></script>
+    <script src="js/history.js" type="text/javascript"></script>
+
+    <title>Untitled 1</title>
+</head>
+
+<body>
+    <div id="calendar"></div>
+
+    <div id="header">
+        <input id="clear-browsing-data" type="button" value="Очистить историю...">
+        <input id="remove-selected" type="button" value="Удалить выбранные элементы" disabled>
+        <input id="search-text" type="text">
+        <div id="clear-text" class="hide"></div>
+        <input id="search-input" type="button" value="Искать в истории">
+        <div id="search-more"></div>
+    </div>
+
+    <div id="content"></div>
+
+    <div id="action-menu" class="menuR">
+        <div id="history-url">История посещений этого адреса</div>
+        <div id="history-domen">История посещений этого сайта</div>
+    </div>
+
+    <div id="buttons">
+        <input id="blackList" type="button" value="Чёрный список">
+        <br>
+        <input id="static" type="button" value="Статистика">
+    </div>
+
+    <div id="blackListBlock" class="window">
+        <div class="close"></div>
+
+        <div class="block">
+            <div class="main">
+                <textarea id="BlackListUrl" wrap="off"></textarea>
+            </div>
+            <div class="help">
+                <h4 id="i18n_blackListUrl_1">Стоп-слова в адресах сайтов:</h4>
+                <p id="i18n_blackListUrl_2">Все адреса, содержащие слова из этого списка, будут исключены из показа в истории. Однако, это не означает, что они будут удалены.</p>
+                <p>
+                    <em id="i18n_blackListUrl_3">Одна строка = одно слово или адрес.</em>
+                </p><ul>
+                    <li>facebook</li>
+                    <li>mail.google.com</li>
+                    <li>http://en.wikipedia.org/wiki/Google_Chrome</li>
+                    <li>http://www.google.ru/images/srpr/logo3w.png</li>
+                </ul>
+                <p></p>
+                <p class="attention"><b>Внимание: </b> чем больше слов в этом списке, тем медленнее работает просмотр истории.</p>
+            </div>
+        </div>
+        <hr>
+        <div class="block">
+            <div class="main">
+                <textarea id="BlackListCaption" wrap="off"></textarea>
+            </div>
+            <div class="help">
+                <h4 id="i18n_blackListUrl_5">Стоп-слова в заголовках сайтов:</h4>
+                <p id="i18n_blackListUrl_6">Все адреса содержащие в заголовке слова из этого списка будут исключены из показа в истории. Однако, это не означает, что они будут удалены.</p>
+                <p>
+                    <em id="i18n_blackListUrl_7">Одна строка = одно слово или словосочетание.</em>
+                </p><ul>
+                    <li>Latest 50 Quotes</li>
+                    <li>Google Reader</li>
+                    <li>Database</li>
+                </ul>
+                <p></p>
+                <p class="attention"><b>Внимание: </b> чем больше слов в этом списке, тем медленнее работает просмотр истории.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="staticBlock" class="window">
+        <div class="close"></div>
+        <h4 id="staticLabel">Список самых посещаемых сайтов:</h4>
+        <div id="staticEntryBlock"></div>
+    </div>
+
+    <div id="action-menu2" class="menuR">
+        <div id="del10min" del="10min">Последние 10 минут</div>
+        <div id="del1hour" del="1hour">Последний 1 час</div>
+        <div id="del12hours" del="12hours">Последние 12 часов</div>
+        <div id="del1day" del="1day">Последние сутки</div>
+        <div id="del7day" del="7day">Последнюю неделю</div>
+        <div id="del1month" del="1month">Последний месяц</div>
+        <div id="delAll" del="All">Всю историю</div>
+    </div>
+
+    <div id="searchBlock" class="window">
+        <div class="close"></div>
+        <h4 id="searchLabel">Показать историю в диапазоне дат:</h4>
+        <div id="searchInputBlock">
+            <input id="search-text2" type="text" placeholder="Поисковый запрос (необязательно)">
+            <input id="search-input2" type="button" value="Показать">
+        </div>
+        <div class="calendarBlock" align="center">
+            <h4 id="intervalCaption1">Начиная с:</h4>
+            <div id="calendarStart"></div>
+        </div>
+        <div class="calendarBlock" align="center">
+            <h4 id="intervalCaption2">Заканчивая на:</h4>
+            <div id="calendarEnd"></div>
+        </div>
+    </div>
+</body>
+</html>

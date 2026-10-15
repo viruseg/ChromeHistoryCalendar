@@ -1,0 +1,384 @@
+{
+   "blackList": {
+      "message": "Lista Negra"
+   },
+   "buttonHint": {
+      "message": "Não mostrar"
+   },
+   "buttonInterval": {
+      "message": "Mostrar"
+   },
+   "captionOptions": {
+      "message": "Preferências"
+   },
+   "clearbrowsingdata": {
+      "message": "Limpar dados de navegação..."
+   },
+   "complete": {
+      "message": "completo"
+   },
+   "dateCaptionDefault": {
+      "message": "Tudo"
+   },
+   "del10min": {
+      "message": "Últimos 10 minutos"
+   },
+   "del12hours": {
+      "message": "Últimas 12 horas"
+   },
+   "del1day": {
+      "message": "Ultimo dia"
+   },
+   "del1hour": {
+      "message": "Últimos 1 hora"
+   },
+   "del1month": {
+      "message": "Mês passado"
+   },
+   "del7day": {
+      "message": "Semana passada"
+   },
+   "delAll": {
+      "message": "Toda a história"
+   },
+   "delURL": {
+      "message": "Enviar URL à lixeira"
+   },
+   "delURLclear": {
+      "message": "Limpar"
+   },
+   "delURLhint": {
+      "message": "Click \u003Cimg src='imgs/Delete.png' title='Send URL to basket' width='16px' height='16px'/> in order to add a URL to the basket."
+   },
+   "deleteAll": {
+      "message": "Enviar todas as URLs para a lixeira"
+   },
+   "diag1": {
+      "message": "Estatísticas"
+   },
+   "diag10": {
+      "message": "Mostrar a lista de sites mais visitados"
+   },
+   "diag11": {
+      "message": "Arquivos locais"
+   },
+   "diag12": {
+      "message": "Altera as configurações Chrome (about: *)"
+   },
+   "diag13": {
+      "message": "Altera extensões Chrome"
+   },
+   "diag14": {
+      "message": "Total de Visitas: "
+   },
+   "diag2": {
+      "message": "Ano:"
+   },
+   "diag3": {
+      "message": "Mês:"
+   },
+   "diag4": {
+      "message": "O cronograma da URL única: "
+   },
+   "diag5": {
+      "message": "Veja a programação da URL única"
+   },
+   "diag6": {
+      "message": "Filtro: "
+   },
+   "diag7": {
+      "message": "filtro - "
+   },
+   "diag8": {
+      "message": "O cronograma da URL única:"
+   },
+   "diag9": {
+      "message": "Lista de sites mais visitados:"
+   },
+   "extension_description": {
+      "description": "Descrição da extensão",
+      "message": "Handy calendar para chrome://history/, você pode visualizar o histórico em qualquer intervalo de tempo. Você também pode ver as estatísticas sobre o uso do navegador."
+   },
+   "firstMonday": {
+      "message": "false"
+   },
+   "hint1": {
+      "message": "Para ver o registro de um dia específico, clique em 'Data' e selecione o número."
+   },
+   "hint2": {
+      "message": "'Todos' Para ver o histórico completo."
+   },
+   "hint3": {
+      "message": "Pesquisas somente para o intervalo de tempo pré-definido."
+   },
+   "hint4": {
+      "message": "Para ver o histórico de alguns dias, use a guia 'Intervalo'."
+   },
+   "hint5": {
+      "message": " - clique neste ícone para exibir uma janela com informações sobre o endereço."
+   },
+   "hint6": {
+      "message": "Para ver um número maior de endereços, use 'Mais' na parte inferior da página."
+   },
+   "historydomen": {
+      "message": "Mais deste site"
+   },
+   "historyurl": {
+      "message": "Mais deste URL"
+   },
+   "i18n_blackListUrl_1": {
+      "message": "Não exibir sites com as seguintes palavras no endereço:"
+   },
+   "i18n_blackListUrl_2": {
+      "message": "Todos os endereços que contêm as palavras nesta lista serão removidos da exibição do histórico. No entanto, isso não significa que eles serão removidos."
+   },
+   "i18n_blackListUrl_3": {
+      "message": "Uma linha = uma palavra, ou o endereço."
+   },
+   "i18n_blackListUrl_4": {
+      "message": "\u003Cb>Attention: \u003C/b> mais palavras nesta lista, mais lento o acesso ao histórico."
+   },
+   "i18n_blackListUrl_5": {
+      "message": "Não exibir sites com as seguintes palavras no título:"
+   },
+   "i18n_blackListUrl_6": {
+      "message": "Todos os endereços desta lista que contêm no título as palavras digitadas serão removidos da exibição do histórico. No entanto, isso não significa que eles serão removidos."
+   },
+   "i18n_blackListUrl_7": {
+      "message": "Uma linha = uma palavra ou frase."
+   },
+   "i18n_caption_selectDateType": {
+      "message": "Formato de data:"
+   },
+   "i18n_donate": {
+      "message": "Doação"
+   },
+   "i18n_donate_1": {
+      "message": "Suporte - Project History Calendar for browser Google Chrome."
+   },
+   "i18n_donate_2": {
+      "message": "Seu dinheiro ajudará a desenvolver o projeto."
+   },
+   "i18n_donate_3": {
+      "message": "Yandex Money:"
+   },
+   "i18n_donate_4": {
+      "message": "Conta:"
+   },
+   "i18n_donate_5": {
+      "message": "Carteira (Purse):"
+   },
+   "i18n_misc": {
+      "message": "Diverso"
+   },
+   "i18n_translate": {
+      "message": "Tradução"
+   },
+   "i18n_translate_1": {
+      "message": "Você quer usar a extensão em sua língua nativa?"
+   },
+   "i18n_translate_2": {
+      "message": "Algum erro encontrado na tradução?"
+   },
+   "i18n_translate_3": {
+      "message": "Envie o seu pedido para o endereço"
+   },
+   "i18n_translate_4": {
+      "message": "Traduzir todas as frases entre aspas necessárias após a palavra 'mensagem:' "
+   },
+   "infURL": {
+      "message": "URL info"
+   },
+   "interval": {
+      "message": "Data: "
+   },
+   "intervalCaption1": {
+      "message": "De:"
+   },
+   "intervalCaption2": {
+      "message": "Até:"
+   },
+   "l": {
+      "message": "pt_BR"
+   },
+   "last10": {
+      "message": "10 Últimos:"
+   },
+   "lastVisit": {
+      "message": "Última visita"
+   },
+   "linkAllHistory": {
+      "message": "Mostrar todo o Histórico..."
+   },
+   "month1": {
+      "message": "janeiro"
+   },
+   "month10": {
+      "message": "outubro"
+   },
+   "month11": {
+      "message": "novembro"
+   },
+   "month12": {
+      "message": "dezembro"
+   },
+   "month2": {
+      "message": "fevereiro"
+   },
+   "month21": {
+      "message": "Janeiro"
+   },
+   "month210": {
+      "message": "Outubro"
+   },
+   "month211": {
+      "message": "Novembro"
+   },
+   "month212": {
+      "message": "Dezembro"
+   },
+   "month22": {
+      "message": "Fevereiro"
+   },
+   "month23": {
+      "message": "Março"
+   },
+   "month24": {
+      "message": "Abril"
+   },
+   "month25": {
+      "message": "Maio"
+   },
+   "month26": {
+      "message": "Junho"
+   },
+   "month27": {
+      "message": "Julho"
+   },
+   "month28": {
+      "message": "Agosto"
+   },
+   "month29": {
+      "message": "Setembro"
+   },
+   "month3": {
+      "message": "março"
+   },
+   "month4": {
+      "message": "abril"
+   },
+   "month5": {
+      "message": "maio"
+   },
+   "month6": {
+      "message": "junho"
+   },
+   "month7": {
+      "message": "julho"
+   },
+   "month8": {
+      "message": "agosto"
+   },
+   "month9": {
+      "message": "setembro"
+   },
+   "more": {
+      "message": "Mais"
+   },
+   "noFind": {
+      "message": "Vazio"
+   },
+   "removeselected": {
+      "message": "Remover itens selecionados"
+   },
+   "resultCount": {
+      "message": "Número de resultados"
+   },
+   "saveButton": {
+      "message": "Salvar"
+   },
+   "search": {
+      "message": "Buscar"
+   },
+   "searchBoxText": {
+      "message": "Buscar"
+   },
+   "searchLabel": {
+      "message": "Mostrar histórico no intervalo de datas:"
+   },
+   "searchPlaceholder": {
+      "message": "Consulta de pesquisa (opcional)"
+   },
+   "searchinput": {
+      "message": "Histórico de pesquisa"
+   },
+   "stars5": {
+      "message": "Obrigado por usar o History Calendar! E não se esqueça de nos dar 5 Estrelas"
+   },
+   "tab0": {
+      "message": "Pista"
+   },
+   "tab1": {
+      "message": "Tudo"
+   },
+   "tab2": {
+      "message": "Data"
+   },
+   "tab3": {
+      "message": "Intervalo"
+   },
+   "termText": {
+      "message": "Digite uma consulta ou um endereço da web"
+   },
+   "title": {
+      "message": "Histórico"
+   },
+   "titleOptions": {
+      "message": "Histórico: Preferências"
+   },
+   "top20button": {
+      "message": "TOP 20,Pizza-Gráfico"
+   },
+   "week1": {
+      "message": "domingo"
+   },
+   "week2": {
+      "message": "segunda"
+   },
+   "week21": {
+      "message": "dom"
+   },
+   "week22": {
+      "message": "seg"
+   },
+   "week23": {
+      "message": "ter"
+   },
+   "week24": {
+      "message": "qua"
+   },
+   "week25": {
+      "message": "qui"
+   },
+   "week26": {
+      "message": "sex"
+   },
+   "week27": {
+      "message": "sáb"
+   },
+   "week3": {
+      "message": "terça"
+   },
+   "week4": {
+      "message": "quarta"
+   },
+   "week5": {
+      "message": "quinta"
+   },
+   "week6": {
+      "message": "sexta"
+   },
+   "week7": {
+      "message": "sabado"
+   }
+}

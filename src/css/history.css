@@ -1,0 +1,659 @@
+html {
+    height: 100%;
+    font-size: 20px;
+}
+
+body {
+    min-height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+#content {
+    margin-top: 3rem;
+}
+
+#calendar {
+    position: fixed;
+    right: .5rem;
+    top: .9rem;
+    z-index: 999;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+}
+
+.line {
+    width: calc(100% - 17rem);
+    min-width: 35rem;
+    font-size: 14px;
+    overflow: hidden;
+    padding-left: .5rem;
+    padding-top: .1rem;
+    padding-bottom: .1rem;
+    margin-top: .2rem;
+    margin-bottom: .2rem;
+    height: 1.6rem;
+    line-height: 1.6rem;
+    position: relative;
+}
+
+.head, .url {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.line>div, .line>a>div {
+    line-height: 1.6rem;
+    float: left;
+}
+
+.time {
+    margin-right: .5rem;
+    width: 7rem;
+}
+
+a:link, a:visited, a:hover {
+    color: #303942;
+    outline: none;
+}
+
+.icon {
+    width: 1rem;
+    height: 1rem;
+    background: no-repeat center;
+    margin-top: .3rem;
+}
+
+.head {
+    margin-left: 0.1rem;
+    margin-right: 1rem;
+    max-width: 45%;
+    min-width: 1rem;
+    overflow-x: hidden;
+}
+
+.url {
+    color: #979CA0;
+    overflow-x: hidden;
+    max-width: 30%;
+    min-width: 1rem;
+}
+
+.menu {
+    background: white url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9IiMwMDAiIHdpZHRoPSI2IiBoZWlnaHQ9IjMiIHZpZXdib3g9IjAgMCA2IDMiPgogIDxwYXRoIGQ9Ik0wIDAgTDYgMCBMMyAzIiB3aWR0aD0iNiIgaGVpZ2h0PSIzIi8+Cjwvc3ZnPgo=) no-repeat center 4px;
+    border: 1px solid rgb(192, 195, 198);
+    border-radius: 2px;
+    height: 10px;
+    padding: 0;
+    position: relative;
+    top: 5px;
+    width: 10px;
+    opacity: 0.6;
+    margin: .2rem 5px 0;
+}
+
+.menu:hover {
+    opacity: 1;
+    border-color: black;
+}
+
+.chk, input[type="button"] {
+    background-image: -webkit-linear-gradient(#ededed, #ededed 38%, #dedede);
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.75);
+    color: #444;
+    outline: none;
+    text-shadow: 0 1px 0 rgb(240, 240, 240);
+    float: left;
+    width: .7rem;
+    height: .7rem;
+    margin: .5rem .2rem 0 0;
+}
+
+.chk {
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.75);
+}
+
+#header {
+    height: 3rem;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    background: linear-gradient(to bottom, rgb(255,255,255) 0%,rgb(255, 255, 255) 70%,rgba(255, 255, 255, 0) 100%);
+    z-index: 10;
+}
+
+input[type="button"] {
+    width: 12rem;
+    background-image: -webkit-linear-gradient(#ededed, #ededed 38%, #dedede);
+    height: 1.2rem;
+    margin: 0.9rem;
+    float: none;
+}
+
+#clear-browsing-data {
+    width: 10rem;
+    margin-right: 0;
+}
+
+input[type="text"] {
+    margin: 0.9rem;
+    height: 1.2rem;
+}
+
+input[type="text"]:focus {
+    border: 1px inset rgb(77, 144, 254);
+}
+
+#search-input {
+    position: absolute;
+    right: 16rem;
+    width: 9rem;
+}
+
+#search-text {
+    position: absolute;
+    right: 25.5rem;
+    width: 10rem;
+}
+
+#remove-selected {
+    margin-left: 0;
+}
+
+input[disabled] {
+    -webkit-filter: sepia(30%) grayscale(100%) contrast(0.8) opacity(0.5);
+    filter: sepia(30%) grayscale(100%) contrast(0.8) opacity(0.5);
+}
+
+.menuR {
+    -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, .50);
+    background: white;
+    border-radius: 2px;
+    color: black;
+    cursor: default;
+    left: 0;
+    margin: 0;
+    outline: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 8px 0;
+    position: fixed;
+    white-space: nowrap;
+    z-index: 1000;
+    display: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.menuR > * {
+    box-sizing: border-box;
+    display: block;
+    text-align: start;
+    width: 100%;
+    padding: .3rem 1rem;
+    font-size: 0.7rem;
+}
+
+.menuR > div:hover {
+    background-color: #F3F3F3;
+}
+
+.menuR > :not(hr) {
+    background: transparent;
+    border: 0;
+    color: black;
+    line-height: 18px;
+    outline: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.menuR > :not(hr):-webkit-any([selected], :active) {
+    background-color: rgba(0, 0, 0, .06);
+}
+
+.lineDate {
+    font-size: 1.1rem;
+    margin-left: 2rem;
+    border-bottom: 1px solid #E8E8E8;
+    padding-left: .3rem;
+    width: calc(100% - 18.9rem);
+    margin-top: 0.8rem;
+}
+
+.del:after {
+    content: '';
+    border-top: 1px solid rgba(255, 0, 0, 0.23);
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    left: 0;
+    top: 0.9rem;
+    margin-left: 8.8rem;
+}
+
+#buttons {
+    position: fixed;
+    right: .5rem;
+    bottom: .9rem;
+    z-index: 998;
+    width: 15.6rem;
+}
+
+#static, #blackList {
+    margin: .2rem 0 0 1.8rem;
+}
+
+.window {
+    position: fixed;
+    left: calc(50% - 411px);
+    top: calc(50% - 264px);
+    width: 800px;
+    height: 506px;
+    border: solid #00BAE4 1px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+    padding: 10px;
+    background-color: #F9F9F9;
+    display: none;
+    z-index: 10000;
+}
+
+.close {
+    right: 0;
+    top: 0;
+    position: absolute;
+    width: 40px;
+    height: 30px;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKAgMAAADwXCcuAAAACVBMVEUAAADCwsIAAACQ0stJAAAAAXRSTlMAQObYZgAAACRJREFUCNdjmMCQwJDCOIFBks2BgS2SgYFxCRiD2CAxkBxIDQCDMAaRKH2ruwAAAABJRU5ErkJggg==) no-repeat center;
+}
+
+.close:hover {
+    background: red url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKAgMAAADwXCcuAAAACVBMVEUAAADtQU////+P4/4cAAAAAXRSTlMAQObYZgAAACRJREFUCNdjmMCQwJDCOIFBks2BgS2SgYFxCRiD2CAxkBxIDQCDMAaRKH2ruwAAAABJRU5ErkJggg==) no-repeat center;
+}
+
+#blackListBlock .block {
+    padding: 0;
+    height: 260px;
+}
+
+#blackListBlock .main {
+    width: 360px;
+    padding: 10px;
+    float: left;
+}
+
+#blackListBlock textarea {
+    width: 350px;
+    height: 233px;
+}
+
+#blackListBlock .help {
+    width: 410px;
+    float: left;
+    font-size: 13px;
+}
+
+#blackListBlock ul {
+    list-style: none;
+}
+
+#blackListBlock hr {
+    border-style: solid;
+    border-bottom: none;
+    border-color: #C7C7C7;
+    position: absolute;
+    left: 1rem;
+    top: 265px;
+    width: 95%;
+    margin: 0;
+}
+
+h4 {
+    margin-bottom: 0.4rem;
+}
+
+.entry {
+    margin-left: 18px;
+    overflow: hidden;
+    padding: 3px 5px;
+    border-bottom: 1px solid #D8D8D8;
+    padding-bottom: 1px;
+    margin-bottom: 2px;
+}
+
+.cap3 {
+    float: left;
+    max-width: 765px;
+}
+
+.cap4 {
+    float: right;
+    min-width: 40px;
+    text-align: right;
+}
+
+#staticEntryBlock {
+    overflow: auto;
+    height: 443px;
+    background: url('/load.gif') no-repeat center;
+}
+
+.bckgNone {
+    background: none!important;
+}
+
+#static_head {
+    font-weight: bold;
+    font-size: 0.77em;
+    margin-bottom: 10px;
+}
+
+
+input[type="button"]:enabled:hover {
+    -webkit-filter: contrast(0.9);
+    filter: contrast(0.9);
+}
+
+#clear-text {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAMAAADXT/YiAAAAZlBMVEUAAADb5fLi6PDT2uRukMXAzePc5/Pd4+3b4OlokchpjcRAdLs/braImbWClK8+Z61hfKtCZ6VfeKNed6FYcZgzVpMsT4coSHrV4vDV4fC8x9qNrNaGq9aNrNWGqtVEbK45X6E8XpjRGOaQAAAAAXRSTlMAQObYZgAAAFBJREFUCNcVycURwDAAxMAzBczsMPTfZBy9NLMYrhXAcgw41UxAZrWDcC2F1JwAlLvbcYqeCE8Q/4y+vMWPAEs1brEmBtPyhCk3A2oZulj6AZgYA1+bn52AAAAAAElFTkSuQmCC) no-repeat center;
+    width: 9px;
+    height: 9px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    top: 1.3rem;
+    right: 26.7rem;
+    z-index: 2;
+    display: none;
+}
+
+#search-text:hover+#clear-text, #search-text:focus+#clear-text, #clear-text:hover {
+    display: block;
+}
+
+.hide {
+    display: none!important;
+}
+
+.attention {
+    display: none;
+}
+
+#search-more {
+    position: absolute;
+    height: 1rem;
+    width: 1rem;
+    top: 1.3em;
+    background: url('/setting.png') no-repeat center;
+    background-size: contain;
+    cursor: pointer;
+}
+.calendarBlock {
+    float: left;
+    width: 400px;
+}
+
+.calendarBlock h4 {
+    text-align: left;
+    padding-left: 2.2rem;
+    font-size: 15px;
+}
+
+#searchLabel {
+    font-size: 15px;
+}
+
+#search-input2 {
+    width: 140px;
+    height: 24px;
+}
+
+#search-text2 {
+    width: 580px;
+    height: 24px;
+}
+
+@media screen and (max-width: 1032px) {
+
+    #calendar div#cw___calendarWin, #calendar div#cw___calendarWin>table, #calendar div#cw___blockMonth, #calendar div.cw___monthControl {
+        font-size: 10px!important;
+    }
+
+    html {
+        font-size: 15px;
+    }
+
+    .line {
+        width: calc(100% - 19rem);
+    }
+
+    .lineDate {
+        width: calc(100% - 20.9rem);
+    }
+
+    #search-input {
+        right: 18rem;
+    }
+
+    #search-text {
+        right: 27.5rem;
+    }
+
+    #clear-text {
+        top: 1.25rem;
+        right: 28.7rem;
+    }
+
+    #remove-selected {
+        width: 14rem;
+    }
+
+    .zh .line {
+        width: calc(100% - 23rem)!important;
+    }
+
+    .zh .lineDate {
+        width: calc(100% - 24.9rem)!important;
+    }
+
+    .zh .url {
+        max-width: 27%!important;
+    }
+
+    .search-input {
+        right: 21rem!important;
+    }
+
+    .search-text {
+        right: 30.5rem!important;
+    }
+
+    .remove-selected {
+        width: 9rem!important;
+    }
+
+}
+
+@media screen and (min-width: 1033px) and (max-width: 1280px) {
+
+    .url {
+        max-width: 24%;
+    }
+
+    html {
+        font-size: 17px;
+    }
+
+    #calendar div#cw___calendarWin, #calendar div#cw___calendarWin>table, #calendar div#cw___blockMonth, #calendar div.cw___monthControl {
+        font-size: 10px!important;
+    }
+
+    .zh .line {
+        width: calc(100% - 20rem)!important;
+    }
+
+    .zh .lineDate {
+        width: calc(100% - 21.9rem)!important;
+    }
+
+    .search-input {
+        right: 19rem!important;
+    }
+
+    .search-text {
+        right: 28.5rem!important;
+    }
+
+    .remove-selected {
+        width: 9rem!important;
+    }
+
+}
+
+@media screen and (min-width: 1430px) {
+
+    #search-text {
+        width: 20rem;
+    }
+
+}
+
+@media screen and (min-width: 1430px) and (max-height: 648px) {
+
+    #cw___infobar {
+        display: none;
+    }
+
+    #calendar #cw___calendarWin table {
+        margin-top: 0!important;
+    }
+}
+
+@media screen and (min-width: 1033px) and (max-width: 1429px) and (max-height: 544px) {
+    #cw___infobar {
+        display: none;
+    }
+
+    #calendar #cw___calendarWin table {
+        margin-top: 0!important;
+    }
+}
+
+@media screen and (min-width: 1280px) and (max-width: 1440px) and (max-height: 629px) {
+    #cw___infobar {
+        display: none;
+    }
+
+    #calendar #cw___calendarWin table {
+        margin-top: 0!important;
+    }
+}
+
+@media screen and (max-width: 1032px) and (max-height: 533px) {
+    #cw___infobar {
+        display: none;
+    }
+
+    #calendar #cw___calendarWin table {
+        margin-top: 0!important;
+    }
+}
+
+@media screen and (min-width: 1431px) and (max-width: 2200px) {
+
+    .zh .line {
+        width: calc(100% - 20rem)!important;
+    }
+
+    .zh .lineDate {
+        width: calc(100% - 21.9rem)!important;
+    }
+
+    .search-input {
+        right: 19rem!important;
+    }
+
+    .search-text {
+        right: 28.5rem!important;
+    }
+
+    .remove-selected {
+        width: 9rem!important;
+    }
+
+}
+
+@media screen and (min-width: 2201px) and (max-width: 2600px) {
+
+    .zh .line {
+        width: calc(100% - 23rem)!important;
+    }
+
+    .zh .lineDate {
+        width: calc(100% - 24.9rem)!important;
+    }
+
+    .search-input {
+        right: 22rem!important;
+    }
+
+    .search-text {
+        right: 31.5rem!important;
+    }
+
+    .remove-selected {
+        width: 9rem!important;
+    }
+
+    .zhW {
+        width: 900px!important;
+        height: 566px!important;
+        left: calc(50% - 461px);
+        top: calc(50% - 294px);
+    }
+
+    .zhW .calendarBlock {
+        width: 450px!important;
+    }
+
+    .zhW #search-text2 {
+        width: 680px!important;
+    }
+}
+
+@media screen and (min-width: 2601px) and (max-width: 2900px) {
+
+    .zh .line {
+        width: calc(100% - 26rem)!important;
+    }
+
+    .zh .lineDate {
+        width: calc(100% - 27.9rem)!important;
+    }
+
+    .search-input {
+        right: 25rem!important;
+    }
+
+    .search-text {
+        right: 34.5rem!important;
+    }
+
+    .remove-selected {
+        width: 9rem!important;
+    }
+
+    .zhW {
+        width: 960px!important;
+        height: 626px!important;
+        left: calc(50% - 491px);
+        top: calc(50% - 324px);
+    }
+
+    .zhW .calendarBlock {
+        width: 480px!important;
+    }
+
+    .zhW #search-text2 {
+        width: 740px!important;
+    }
+}

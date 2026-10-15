@@ -1,0 +1,384 @@
+{
+   "blackList": {
+      "message": "Black List"
+   },
+   "buttonHint": {
+      "message": "Do not show"
+   },
+   "buttonInterval": {
+      "message": "Show"
+   },
+   "captionOptions": {
+      "message": "Preferences"
+   },
+   "clearbrowsingdata": {
+      "message": "Clear browsing data..."
+   },
+   "complete": {
+      "message": "complete"
+   },
+   "dateCaptionDefault": {
+      "message": "All"
+   },
+   "del10min": {
+      "message": "Last 10 minutes"
+   },
+   "del12hours": {
+      "message": "Last 12 hours"
+   },
+   "del1day": {
+      "message": "Last day"
+   },
+   "del1hour": {
+      "message": "Last 1 hours"
+   },
+   "del1month": {
+      "message": "Last month"
+   },
+   "del7day": {
+      "message": "Last week"
+   },
+   "delAll": {
+      "message": "All history"
+   },
+   "delURL": {
+      "message": "Send URL to basket"
+   },
+   "delURLclear": {
+      "message": "Clear"
+   },
+   "delURLhint": {
+      "message": "Click \u003Cimg src='imgs/Delete.png' title='Send URL to basket' width='16px' height='16px'/> in order to add a URL to the basket."
+   },
+   "deleteAll": {
+      "message": "Send all URL to basket"
+   },
+   "diag1": {
+      "message": "Statistics"
+   },
+   "diag10": {
+      "message": "Show the list of most visited websites"
+   },
+   "diag11": {
+      "message": "Local files"
+   },
+   "diag12": {
+      "message": "Changes the settings Chrome (about:*)"
+   },
+   "diag13": {
+      "message": "Changes extensions Chrome"
+   },
+   "diag14": {
+      "message": "Total Visits: "
+   },
+   "diag2": {
+      "message": "Year:"
+   },
+   "diag3": {
+      "message": "Month:"
+   },
+   "diag4": {
+      "message": "The schedule of unique URL: "
+   },
+   "diag5": {
+      "message": "See the schedule of unique URL"
+   },
+   "diag6": {
+      "message": "Filter: "
+   },
+   "diag7": {
+      "message": "filter - "
+   },
+   "diag8": {
+      "message": "The schedule of unique URL:"
+   },
+   "diag9": {
+      "message": "List of most visited websites:"
+   },
+   "extension_description": {
+      "description": "Description of the extension",
+      "message": "Handy calendar for chrome://history/, you can view the history for any time interval. Also you can see your statistics."
+   },
+   "firstMonday": {
+      "message": "false"
+   },
+   "hint1": {
+      "message": "To view the log for a specific day, click the 'Date' and select the number."
+   },
+   "hint2": {
+      "message": "To view the history of the entire tab to 'All'."
+   },
+   "hint3": {
+      "message": "Searches only for the pre-selected time interval."
+   },
+   "hint4": {
+      "message": "To view stories for a few days, use the tab 'Interval'."
+   },
+   "hint5": {
+      "message": " - click on this icon displays a window with information about the address."
+   },
+   "hint6": {
+      "message": "To view a larger number of addresses, use the 'More' bottom of the page."
+   },
+   "historydomen": {
+      "message": "More from this site"
+   },
+   "historyurl": {
+      "message": "More from this URL"
+   },
+   "i18n_blackListUrl_1": {
+      "message": "Stop words in the addresses of sites:"
+   },
+   "i18n_blackListUrl_2": {
+      "message": "All the addresses containing the words from this list will be removed from display in history. However, this does not mean that they will be removed."
+   },
+   "i18n_blackListUrl_3": {
+      "message": "One line = one word, or address."
+   },
+   "i18n_blackListUrl_4": {
+      "message": "\u003Cb>Attention: \u003C/b> more words on this list, the slower browsing history."
+   },
+   "i18n_blackListUrl_5": {
+      "message": "Stop words in the title of sites:"
+   },
+   "i18n_blackListUrl_6": {
+      "message": "All the addresses containing the words in the title of this list will be removed from display in history. However, this does not mean that they will be removed."
+   },
+   "i18n_blackListUrl_7": {
+      "message": "One line = one word or phrase."
+   },
+   "i18n_caption_selectDateType": {
+      "message": "Date format:"
+   },
+   "i18n_donate": {
+      "message": "Donate"
+   },
+   "i18n_donate_1": {
+      "message": "Support Project History Calendar for browser Google Chrome."
+   },
+   "i18n_donate_2": {
+      "message": "Your money will help further develop the project."
+   },
+   "i18n_donate_3": {
+      "message": "Yandex Money:"
+   },
+   "i18n_donate_4": {
+      "message": "Account:"
+   },
+   "i18n_donate_5": {
+      "message": "Purse:"
+   },
+   "i18n_misc": {
+      "message": "Misc"
+   },
+   "i18n_translate": {
+      "message": "Translation"
+   },
+   "i18n_translate_1": {
+      "message": "Do you want to use the extension in your native language?"
+   },
+   "i18n_translate_2": {
+      "message": "Found error in translation?"
+   },
+   "i18n_translate_3": {
+      "message": "Send your order to the address"
+   },
+   "i18n_translate_4": {
+      "message": "Translate all the phrases needed in quotes after the word 'message:'"
+   },
+   "infURL": {
+      "message": "URL info"
+   },
+   "interval": {
+      "message": "Date: "
+   },
+   "intervalCaption1": {
+      "message": "From:"
+   },
+   "intervalCaption2": {
+      "message": "To:"
+   },
+   "l": {
+      "message": "en"
+   },
+   "last10": {
+      "message": "Last 10:"
+   },
+   "lastVisit": {
+      "message": "Last visit"
+   },
+   "linkAllHistory": {
+      "message": "Show all history..."
+   },
+   "month1": {
+      "message": "january"
+   },
+   "month10": {
+      "message": "october"
+   },
+   "month11": {
+      "message": "november"
+   },
+   "month12": {
+      "message": "december"
+   },
+   "month2": {
+      "message": "february"
+   },
+   "month21": {
+      "message": "January"
+   },
+   "month210": {
+      "message": "October"
+   },
+   "month211": {
+      "message": "November"
+   },
+   "month212": {
+      "message": "December"
+   },
+   "month22": {
+      "message": "February"
+   },
+   "month23": {
+      "message": "March"
+   },
+   "month24": {
+      "message": "April"
+   },
+   "month25": {
+      "message": "May"
+   },
+   "month26": {
+      "message": "June"
+   },
+   "month27": {
+      "message": "July"
+   },
+   "month28": {
+      "message": "August"
+   },
+   "month29": {
+      "message": "September"
+   },
+   "month3": {
+      "message": "march"
+   },
+   "month4": {
+      "message": "april"
+   },
+   "month5": {
+      "message": "may"
+   },
+   "month6": {
+      "message": "june"
+   },
+   "month7": {
+      "message": "july"
+   },
+   "month8": {
+      "message": "august"
+   },
+   "month9": {
+      "message": "september"
+   },
+   "more": {
+      "message": "More"
+   },
+   "noFind": {
+      "message": "Empty"
+   },
+   "removeselected": {
+      "message": "Remove selected items"
+   },
+   "resultCount": {
+      "message": "Number of results"
+   },
+   "saveButton": {
+      "message": "Save"
+   },
+   "search": {
+      "message": "Search"
+   },
+   "searchBoxText": {
+      "message": "Search"
+   },
+   "searchLabel": {
+      "message": "Show history in the date range:"
+   },
+   "searchPlaceholder": {
+      "message": "Search query (optional)"
+   },
+   "searchinput": {
+      "message": "Search history"
+   },
+   "stars5": {
+      "message": "Thank you for using History Calendar! Don't forget to... Rate 5 Stars"
+   },
+   "tab0": {
+      "message": "Hint"
+   },
+   "tab1": {
+      "message": "All"
+   },
+   "tab2": {
+      "message": "Date"
+   },
+   "tab3": {
+      "message": "Interval"
+   },
+   "termText": {
+      "message": "Enter a query or a web address"
+   },
+   "title": {
+      "message": "History"
+   },
+   "titleOptions": {
+      "message": "History: Preferences"
+   },
+   "top20button": {
+      "message": "TOP 20, Pie Chart"
+   },
+   "week1": {
+      "message": "sunday"
+   },
+   "week2": {
+      "message": "monday"
+   },
+   "week21": {
+      "message": "sun"
+   },
+   "week22": {
+      "message": "mon"
+   },
+   "week23": {
+      "message": "w"
+   },
+   "week24": {
+      "message": "wed"
+   },
+   "week25": {
+      "message": "tue"
+   },
+   "week26": {
+      "message": "fr"
+   },
+   "week27": {
+      "message": "sat"
+   },
+   "week3": {
+      "message": "tuesday"
+   },
+   "week4": {
+      "message": "wednesday"
+   },
+   "week5": {
+      "message": "thursday"
+   },
+   "week6": {
+      "message": "friday"
+   },
+   "week7": {
+      "message": "saturday"
+   }
+}

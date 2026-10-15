@@ -1,0 +1,384 @@
+{
+   "blackList": {
+      "message": "Lista Nera"
+   },
+   "buttonHint": {
+      "message": "Nascondi"
+   },
+   "buttonInterval": {
+      "message": "Visualizza"
+   },
+   "captionOptions": {
+      "message": "Preferenze"
+   },
+   "clearbrowsingdata": {
+      "message": "Cancella dati di navigazione..."
+   },
+   "complete": {
+      "message": "completare"
+   },
+   "dateCaptionDefault": {
+      "message": "Tutti"
+   },
+   "del10min": {
+      "message": "Ultimi 10 minuti"
+   },
+   "del12hours": {
+      "message": "Ultime 12 ore"
+   },
+   "del1day": {
+      "message": "L'ultimo giorno"
+   },
+   "del1hour": {
+      "message": "Le ultime 1 ore"
+   },
+   "del1month": {
+      "message": "Lo scorso mese"
+   },
+   "del7day": {
+      "message": "La scorsa settimana"
+   },
+   "delAll": {
+      "message": "Tutta la storia"
+   },
+   "delURL": {
+      "message": "Metti URL nel cestino"
+   },
+   "delURLclear": {
+      "message": "Pulisci"
+   },
+   "delURLhint": {
+      "message": "Fai Clic su \u003Cimg src='imgs/Delete.png' title='Metti URL nel cestino' width='16px' height='16px'/> per mettere l'URL nel cestino."
+   },
+   "deleteAll": {
+      "message": "Metti tutti gli URL nel cestino"
+   },
+   "diag1": {
+      "message": "Statistiche"
+   },
+   "diag10": {
+      "message": "Mostra la lista dei siti più visitati"
+   },
+   "diag11": {
+      "message": "File locali"
+   },
+   "diag12": {
+      "message": "Changes the settings Chrome (about:*)"
+   },
+   "diag13": {
+      "message": "Changes extensions Chrome"
+   },
+   "diag14": {
+      "message": "Visite totali: "
+   },
+   "diag2": {
+      "message": "Anno:"
+   },
+   "diag3": {
+      "message": "Mese:"
+   },
+   "diag4": {
+      "message": "Statistiche per un URL specifico: "
+   },
+   "diag5": {
+      "message": "Mostra le statistiche per un URL specifico"
+   },
+   "diag6": {
+      "message": "Filtro: "
+   },
+   "diag7": {
+      "message": "filtro - "
+   },
+   "diag8": {
+      "message": "Statistiche per un URL specifico:"
+   },
+   "diag9": {
+      "message": "Lista dei siti più visitati:"
+   },
+   "extension_description": {
+      "description": "Descrizione della estensione",
+      "message": "Calendario facile per chrome://history/, и possibile visualizzare la cronologia per ogni intervallo di tempo. Inoltre и possibile visualizzare le statistiche sull'utilizzo di un browser."
+   },
+   "firstMonday": {
+      "message": "true"
+   },
+   "hint1": {
+      "message": "Per visualizzare il registro per un giorno specifico, fare clic su 'Data' e selezionare il giorno."
+   },
+   "hint2": {
+      "message": "Per visualizzare la cronologia completa, fare clic su 'Tutti'."
+   },
+   "hint3": {
+      "message": "Ricerche solo per l'intervallo scelto."
+   },
+   "hint4": {
+      "message": "Per visualizzare la cronologia in un certo intervallo, fare clic su 'Intervallo'."
+   },
+   "hint5": {
+      "message": " - fare clic su questa icons mostra maggiorni informazioni dul sito."
+   },
+   "hint6": {
+      "message": "Per visualizzare più elementi della cronologia, fare clic su 'Avanti' in fondo a questa pagina."
+   },
+   "historydomen": {
+      "message": "Altri dal sito"
+   },
+   "historyurl": {
+      "message": "Altri dal URL"
+   },
+   "i18n_blackListUrl_1": {
+      "message": "Parole di blocco negli indirizzi dei siti:"
+   },
+   "i18n_blackListUrl_2": {
+      "message": "Tutti gli indirizzi che contengono le parole da questo elenco verranno rimosse dalla visulaizzazione della cronologia. Tuttavia, questo non significa che essi vengono rimossi dalla cronologia."
+   },
+   "i18n_blackListUrl_3": {
+      "message": "Una riga = una parola, oppure un indirizzo."
+   },
+   "i18n_blackListUrl_4": {
+      "message": "\u003Cb>Attenzione: \u003C/b> più parole nell'elenco fa che la navigazione della lista cronologia diventa più lenta."
+   },
+   "i18n_blackListUrl_5": {
+      "message": "Parole di blocco nel titolo dei siti:"
+   },
+   "i18n_blackListUrl_6": {
+      "message": "Tutti le pagine che contengono le parole da questo elenco nel titolo verranno rimosse dalla visulaizzazione della cronologia. Tuttavia, questo non significa che essi vengono rimossi dalla cronologia."
+   },
+   "i18n_blackListUrl_7": {
+      "message": "Una riga = una parola oppure una frase."
+   },
+   "i18n_caption_selectDateType": {
+      "message": "Formato data:"
+   },
+   "i18n_donate": {
+      "message": "Donazioni"
+   },
+   "i18n_donate_1": {
+      "message": "Aiuta il progetto History Calendar per Google Chrome."
+   },
+   "i18n_donate_2": {
+      "message": "La tua donazione ci aiuta negli sviluppi futuri del progetto."
+   },
+   "i18n_donate_3": {
+      "message": "Yandex Money:"
+   },
+   "i18n_donate_4": {
+      "message": "Account:"
+   },
+   "i18n_donate_5": {
+      "message": "Purse:"
+   },
+   "i18n_misc": {
+      "message": "Varie"
+   },
+   "i18n_translate": {
+      "message": "Traduzioni"
+   },
+   "i18n_translate_1": {
+      "message": "Vuoi usare questa estenzione nella lingua madre tua?"
+   },
+   "i18n_translate_2": {
+      "message": "Trova un errore nella traduzione?"
+   },
+   "i18n_translate_3": {
+      "message": "Invia le tue note e segnalazioni a "
+   },
+   "i18n_translate_4": {
+      "message": "Traduci tutte le frasi tra virgolette dopo la parola 'message:'"
+   },
+   "infURL": {
+      "message": "Info URL"
+   },
+   "interval": {
+      "message": "Data: "
+   },
+   "intervalCaption1": {
+      "message": "Da:"
+   },
+   "intervalCaption2": {
+      "message": "A:"
+   },
+   "l": {
+      "message": "it"
+   },
+   "last10": {
+      "message": "Ultimi 10:"
+   },
+   "lastVisit": {
+      "message": "Ultima visita"
+   },
+   "linkAllHistory": {
+      "message": "Mostra tutta la cronologia..."
+   },
+   "month1": {
+      "message": "gennaio"
+   },
+   "month10": {
+      "message": "ottobre"
+   },
+   "month11": {
+      "message": "novembre"
+   },
+   "month12": {
+      "message": "dicembre"
+   },
+   "month2": {
+      "message": "febbraio"
+   },
+   "month21": {
+      "message": "Gennaio"
+   },
+   "month210": {
+      "message": "Ottobre"
+   },
+   "month211": {
+      "message": "Novembre"
+   },
+   "month212": {
+      "message": "Dicembre"
+   },
+   "month22": {
+      "message": "Febbraio"
+   },
+   "month23": {
+      "message": "Marzo"
+   },
+   "month24": {
+      "message": "Aprile"
+   },
+   "month25": {
+      "message": "Maggio"
+   },
+   "month26": {
+      "message": "Giugno"
+   },
+   "month27": {
+      "message": "Luglio"
+   },
+   "month28": {
+      "message": "Agosto"
+   },
+   "month29": {
+      "message": "Settembre"
+   },
+   "month3": {
+      "message": "marzo"
+   },
+   "month4": {
+      "message": "aprile"
+   },
+   "month5": {
+      "message": "maggio"
+   },
+   "month6": {
+      "message": "giugno"
+   },
+   "month7": {
+      "message": "luglio"
+   },
+   "month8": {
+      "message": "agosto"
+   },
+   "month9": {
+      "message": "settembre"
+   },
+   "more": {
+      "message": "Avanti"
+   },
+   "noFind": {
+      "message": "Vuoto"
+   },
+   "removeselected": {
+      "message": "Rimuovi gli elementi selezionati"
+   },
+   "resultCount": {
+      "message": "Numero di risultati"
+   },
+   "saveButton": {
+      "message": "Salva"
+   },
+   "search": {
+      "message": "Cerca"
+   },
+   "searchBoxText": {
+      "message": "Cerca"
+   },
+   "searchLabel": {
+      "message": "Mostra storia nel intervallo di date:"
+   },
+   "searchPlaceholder": {
+      "message": "Query di ricerca (opzionale)"
+   },
+   "searchinput": {
+      "message": "Cerca nella cronologia"
+   },
+   "stars5": {
+      "message": "Grazie per aver usato History Calendar! Non dimenticare di darci il voto... 5 Stelle"
+   },
+   "tab0": {
+      "message": "Suggerimenti"
+   },
+   "tab1": {
+      "message": "Tutti"
+   },
+   "tab2": {
+      "message": "Data"
+   },
+   "tab3": {
+      "message": "Intervallo"
+   },
+   "termText": {
+      "message": "Immettere una parola o un indirizzo web"
+   },
+   "title": {
+      "message": "Cronologia"
+   },
+   "titleOptions": {
+      "message": "History: Preferenze"
+   },
+   "top20button": {
+      "message": "Top 20, grafico"
+   },
+   "week1": {
+      "message": "domenica"
+   },
+   "week2": {
+      "message": "lunedi"
+   },
+   "week21": {
+      "message": "do"
+   },
+   "week22": {
+      "message": "lu"
+   },
+   "week23": {
+      "message": "ma"
+   },
+   "week24": {
+      "message": "me"
+   },
+   "week25": {
+      "message": "gi"
+   },
+   "week26": {
+      "message": "ve"
+   },
+   "week27": {
+      "message": "sa"
+   },
+   "week3": {
+      "message": "martedi"
+   },
+   "week4": {
+      "message": "mercoledi"
+   },
+   "week5": {
+      "message": "giovedi"
+   },
+   "week6": {
+      "message": "venerdi"
+   },
+   "week7": {
+      "message": "sabato"
+   }
+}

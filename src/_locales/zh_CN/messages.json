@@ -1,0 +1,384 @@
+{
+   "blackList": {
+      "message": "黑名单"
+   },
+   "buttonHint": {
+      "message": "不要显示"
+   },
+   "buttonInterval": {
+      "message": "显示"
+   },
+   "captionOptions": {
+      "message": "首选项"
+   },
+   "clearbrowsingdata": {
+      "message": "清除浏览数据..."
+   },
+   "complete": {
+      "message": "完成"
+   },
+   "dateCaptionDefault": {
+      "message": "全部"
+   },
+   "del10min": {
+      "message": "最后10分钟"
+   },
+   "del12hours": {
+      "message": "过去的12小时"
+   },
+   "del1day": {
+      "message": "最后一天"
+   },
+   "del1hour": {
+      "message": "1小时以来"
+   },
+   "del1month": {
+      "message": "上个月"
+   },
+   "del7day": {
+      "message": "上个星期"
+   },
+   "delAll": {
+      "message": "所有的历史"
+   },
+   "delURL": {
+      "message": "将记录丢入废纸篓"
+   },
+   "delURLclear": {
+      "message": "清除"
+   },
+   "delURLhint": {
+      "message": "点击 \u003Cimg src='imgs/Delete.png' title='将记录丢入废纸篓' width='16px' height='16px'/> 将该记录丢入废纸篓。"
+   },
+   "deleteAll": {
+      "message": "将全部记录丢入废纸篓"
+   },
+   "diag1": {
+      "message": "统计"
+   },
+   "diag10": {
+      "message": "展示最经常访问的网址"
+   },
+   "diag11": {
+      "message": "本地文件"
+   },
+   "diag12": {
+      "message": "页面设置 Chrome (about:*)"
+   },
+   "diag13": {
+      "message": "页面扩展 Chrome"
+   },
+   "diag14": {
+      "message": "总访问量： "
+   },
+   "diag2": {
+      "message": "年："
+   },
+   "diag3": {
+      "message": "月："
+   },
+   "diag4": {
+      "message": "特定网址的访问记录： "
+   },
+   "diag5": {
+      "message": "查看此网址的访问记录"
+   },
+   "diag6": {
+      "message": "过滤器： "
+   },
+   "diag7": {
+      "message": "过滤器 - "
+   },
+   "diag8": {
+      "message": "特定网址的访问记录："
+   },
+   "diag9": {
+      "message": "最常访问网址排名："
+   },
+   "extension_description": {
+      "description": "Description of the extension",
+      "message": "方便的日历 chrome://history/，你可以查看任何时间间隔的历史，也可以查看浏览器的使用统计。"
+   },
+   "firstMonday": {
+      "message": "true"
+   },
+   "hint1": {
+      "message": "要查看特定日期的历史记录，请点击“日期”并选择具体日期。"
+   },
+   "hint2": {
+      "message": "要查看全部标签页的历史记录，请选择“全部”标签。"
+   },
+   "hint3": {
+      "message": "仅在预先选择的时间区间内搜索。"
+   },
+   "hint4": {
+      "message": "要查看特定数天的历史记录，请使用“区间”标签。"
+   },
+   "hint5": {
+      "message": " - 点击本图标可显示地址信息窗口。"
+   },
+   "hint6": {
+      "message": "要查看更多地址，请点击页面底部的“更多”。"
+   },
+   "historydomen": {
+      "message": "来自该网站的更多内容"
+   },
+   "historyurl": {
+      "message": "更多来自该网址"
+   },
+   "i18n_blackListUrl_1": {
+      "message": "不显示含有该关键词的历史纪录:"
+   },
+   "i18n_blackListUrl_2": {
+      "message": "隐藏所有含有该关键词的历史纪录，然而它们并不会被删除。"
+   },
+   "i18n_blackListUrl_3": {
+      "message": "格式：一行 = 一个关键词或网址"
+   },
+   "i18n_blackListUrl_4": {
+      "message": "\u003Cb>注意： \u003C/b> 黑名单越多，加载历史纪录越慢"
+   },
+   "i18n_blackListUrl_5": {
+      "message": "不显示网页标题含有该关键词的历史纪录:"
+   },
+   "i18n_blackListUrl_6": {
+      "message": "隐藏标题中所有含有该关键词的历史纪录，然而它们并不会被删除。"
+   },
+   "i18n_blackListUrl_7": {
+      "message": "格式：一行 = 一个关键词或网址"
+   },
+   "i18n_caption_selectDateType": {
+      "message": "日期格式："
+   },
+   "i18n_donate": {
+      "message": "捐赠"
+   },
+   "i18n_donate_1": {
+      "message": "支持 Google Chrome 浏览器的 History Calendar（历史纪录日历）项目."
+   },
+   "i18n_donate_2": {
+      "message": "您的捐款可以帮助我们更好的开发此项目。"
+   },
+   "i18n_donate_3": {
+      "message": "Yandex Money:"
+   },
+   "i18n_donate_4": {
+      "message": "帐号："
+   },
+   "i18n_donate_5": {
+      "message": "钱包:"
+   },
+   "i18n_misc": {
+      "message": "杂项"
+   },
+   "i18n_translate": {
+      "message": "翻译"
+   },
+   "i18n_translate_1": {
+      "message": "希望用您的母语使用这个扩展程序吗？"
+   },
+   "i18n_translate_2": {
+      "message": "发现翻译错误？"
+   },
+   "i18n_translate_3": {
+      "message": "把您的建议发送到这个地址"
+   },
+   "i18n_translate_4": {
+      "message": "在 'message:' 后把翻译后的句子写在引号中"
+   },
+   "infURL": {
+      "message": "URL 信息"
+   },
+   "interval": {
+      "message": "日期: "
+   },
+   "intervalCaption1": {
+      "message": "从:"
+   },
+   "intervalCaption2": {
+      "message": "到:"
+   },
+   "l": {
+      "message": "zh_CN"
+   },
+   "last10": {
+      "message": "最近 10 条:"
+   },
+   "lastVisit": {
+      "message": "上次访问"
+   },
+   "linkAllHistory": {
+      "message": "显示全部历史..."
+   },
+   "month1": {
+      "message": "1 月"
+   },
+   "month10": {
+      "message": "10 月"
+   },
+   "month11": {
+      "message": "11 月"
+   },
+   "month12": {
+      "message": "12 月"
+   },
+   "month2": {
+      "message": "2 月"
+   },
+   "month21": {
+      "message": "一月"
+   },
+   "month210": {
+      "message": "十月"
+   },
+   "month211": {
+      "message": "十一月"
+   },
+   "month212": {
+      "message": "十二月"
+   },
+   "month22": {
+      "message": "二月"
+   },
+   "month23": {
+      "message": "三月"
+   },
+   "month24": {
+      "message": "四月"
+   },
+   "month25": {
+      "message": "五月"
+   },
+   "month26": {
+      "message": "六月"
+   },
+   "month27": {
+      "message": "七月"
+   },
+   "month28": {
+      "message": "八月"
+   },
+   "month29": {
+      "message": "九月"
+   },
+   "month3": {
+      "message": "3 月"
+   },
+   "month4": {
+      "message": "4 月"
+   },
+   "month5": {
+      "message": "5 月"
+   },
+   "month6": {
+      "message": "6 月"
+   },
+   "month7": {
+      "message": "7 月"
+   },
+   "month8": {
+      "message": "8 月"
+   },
+   "month9": {
+      "message": "9 月"
+   },
+   "more": {
+      "message": "更多"
+   },
+   "noFind": {
+      "message": "找不到该内容。"
+   },
+   "removeselected": {
+      "message": "移除所选项"
+   },
+   "resultCount": {
+      "message": "结果数量"
+   },
+   "saveButton": {
+      "message": "保存"
+   },
+   "search": {
+      "message": "搜索"
+   },
+   "searchBoxText": {
+      "message": "搜索"
+   },
+   "searchLabel": {
+      "message": "露的历史迄今系列的："
+   },
+   "searchPlaceholder": {
+      "message": "的搜索查询的（选择性）"
+   },
+   "searchinput": {
+      "message": "搜索历史记录"
+   },
+   "stars5": {
+      "message": "感谢您使用 History Calendar! 别忘了……给我们五星好评哦"
+   },
+   "tab0": {
+      "message": "提示"
+   },
+   "tab1": {
+      "message": "全部"
+   },
+   "tab2": {
+      "message": "日期"
+   },
+   "tab3": {
+      "message": "区间"
+   },
+   "termText": {
+      "message": "输入查询或网址"
+   },
+   "title": {
+      "message": "历史"
+   },
+   "titleOptions": {
+      "message": "历史：首选项"
+   },
+   "top20button": {
+      "message": "查看前20名最常访问的饼图"
+   },
+   "week1": {
+      "message": "周日"
+   },
+   "week2": {
+      "message": "周一"
+   },
+   "week21": {
+      "message": "日"
+   },
+   "week22": {
+      "message": "一"
+   },
+   "week23": {
+      "message": "二"
+   },
+   "week24": {
+      "message": "三"
+   },
+   "week25": {
+      "message": "四"
+   },
+   "week26": {
+      "message": "五"
+   },
+   "week27": {
+      "message": "六"
+   },
+   "week3": {
+      "message": "周二"
+   },
+   "week4": {
+      "message": "周三"
+   },
+   "week5": {
+      "message": "周四"
+   },
+   "week6": {
+      "message": "周五"
+   },
+   "week7": {
+      "message": "周六"
+   }
+}

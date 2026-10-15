@@ -1,0 +1,230 @@
+div#cw___calendarWin, div#cw___calendarWin>table, div#cw___blockMonth, div.cw___monthControl {
+    font-size: 12px;
+}
+
+.cw___absolute {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#cw___calendarWin .cw___hide, .cw___hide {
+    display: none;
+}
+
+#cw___calendarWin #cw___infobar {
+    height: 15.7em;
+    z-index: 1;
+}
+
+#cw___calendarWin #cw___infobarWeek, #cw___calendarWin #cw___infobarMonth, #cw___calendarWin #cw___infobarDay, #cw___calendarWin #cw___infobarYear {
+    background-color: rgb(153, 153, 153);
+    text-align: center;
+    color: white;
+    font-size: 2em;
+    font-variant: small-caps;
+}
+
+#cw___calendarWin #cw___infobarMonth, #cw___calendarWin #cw___infobarDay, #cw___calendarWin #cw___infobarYear {
+    background-color: white;
+    color: rgb(51, 181, 229);
+    font-size: 3em;
+}
+
+#cw___calendarWin #cw___infobarWeek {
+    padding-bottom: .2em;
+}
+
+#cw___calendarWin #cw___infobarMonth {
+    padding-top: .3em;
+}
+
+#cw___calendarWin #cw___infobarDay {
+    font-size: 5em;
+}
+
+#cw___calendarWin #cw___infobarYear {
+    font-size: 2em;
+    color: rgb(153, 153, 153);
+    padding-bottom: .7em;
+}
+
+#cw___calendarWin.cw___shadow {
+    box-shadow: 4px 4px 24px 0px rgba(0,0,0,0.75);
+}
+
+div#cw___calendarWin {
+    background-color: rgb(242, 242, 242);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 26em;
+    font-family: sans-serif;
+    position: relative;
+}
+
+#cw___calendarWin table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin: 1.5em auto 0;
+    z-index: 1;
+}
+
+#cw___calendarWin tr:nth-child(2) {
+    border-bottom: .1em rgb(205, 205, 205) solid;
+}
+
+#cw___calendarWin td, #cw___calendarWin th {
+    padding: 1em;
+    font-size: 1.1em;
+    line-height: 1.1em;
+    height: 1.1em;
+    width: 1.5em;
+    text-align: center;
+    color: rgb(153, 153, 153);
+}
+
+#cw___calendarWin td {
+    font-variant: small-caps;
+}
+
+#cw___calendarWin .cw___day {
+    color: black;
+}
+
+#cw___calendarWin .cw___active, #cw___calendarWin .cw___buttonJump {
+    position: relative;
+}
+
+#cw___calendarWin .cw___buttonJump {
+    font-size: 1em;
+}
+
+#cw___calendarWin .cw___active:hover:before, #cw___calendarWin .cw___selected:before, #cw___calendarWin .cw___buttonJump:hover:before,
+#cw___calendarWin .cw___selectedMonth:before, #cw___calendarWin .cw___monthButton:hover:before,
+#cw___calendarWin .cw___selectedYear:before, #cw___calendarWin .cw___yearButton:hover:before{
+    content: '';
+    width: 2.3em;
+    height: 2.3em;
+    background-color: rgba(71, 207, 255, 0.19);
+    position: absolute;
+    left: .6em;
+    top: .35em;
+    border-radius: 5em;
+}
+
+#cw___calendarWin .cw___active, #cw___calendarWin .cw___buttonJump {
+    cursor: pointer;
+}
+
+#cw___calendarWin .cw___buttonJump:hover:before {
+    left: -.4em;
+    top: -.55em;
+}
+
+#cw___calendarWin .cw___now, #cw___calendarWin .cw___selectedMonth:before, #cw___calendarWin .cw___selectedYear:before {
+    color: rgb(51, 181, 229);
+}
+
+#cw___calendarWin #cw___buttonComplete {
+    text-align: center;
+    color: black;
+    font-size: 1.5em;
+    font-variant: small-caps;
+    border-top: .1em rgb(205, 205, 205) solid;
+    font-weight: bold;
+    padding: .5em;
+    cursor: pointer;
+}
+
+#cw___calendarWin #cw___buttonComplete:hover {
+    color: rgb(51, 181, 229);
+}
+
+#cw___calendarWin .cw___blockMonth {
+    width: 26em;
+    position: absolute;
+    bottom: 0;
+    height: 26.7em;
+    background-color: #F2F2F2;
+    z-index: 5;
+    display: none;
+}
+
+#cw___calendarWin .cw___blockMonthMargin {
+    margin-bottom: 3.4em;
+}
+
+#cw___calendarWin .cw___monthControl {
+    height: 3.7em;
+    line-height: 3.7em;
+}
+
+#cw___calendarWin .cw___monthControl div {
+    float: left;
+}
+
+#cw___calendarWin .cw___buttonJump2 {
+    width: 3.3em!important;
+    text-align: center;
+    margin-top: -0.2em;
+    color: rgb(153, 153, 153);
+    font-size: 1.1em!important;
+    margin-left: .1em;
+}
+
+#cw___calendarWin .cw___buttonCentr {
+    width: 14.2em;
+    font-size: 1.3em;
+    text-align: center;
+    color: rgb(153, 153, 153);
+    margin-top: -.2em;
+    font-weight: bold;
+}
+
+#cw___calendarWin .cw___buttonJump2:hover:before {
+    left: .4em;
+    top: .55em;
+}
+
+.cw___monthButton, .cw___yearButton {
+    width: 6.7em;
+    float: left;
+    font-size: 1.7em;
+    margin-left: .7em;
+    padding: .5em 0;
+    text-align: center;
+    position: relative;
+    color: rgb(115, 115, 115);
+    -webkit-padding-before: .55em;
+    -webkit-padding-after: .55em;
+}
+
+#cw___calendarWin .cw___yearButton {
+    width: 4.2em;
+}
+
+#cw___calendarWin .cw___selectedMonth:before, #cw___calendarWin .cw___monthButton:hover:before {
+    border-radius: 0.3em;
+    width: 6.7em;
+    height: 1.7em;
+    top: .2em;
+    left: 0;
+}
+
+#cw___calendarWin .cw___selectedYear:before, #cw___calendarWin .cw___yearButton:hover:before {
+    border-radius: .3em;
+    width: 4.2em;
+    height: 1.7em;
+    top: .2em;
+    left: 0;
+}
+
+#cw___calendarWin #cw___captionYear, #cw___calendarWin #cw___captionMonth, #cw___calendarWin #cw___monthChange {
+    cursor: pointer;
+}
+
+#cw___calendarWin #cw___captionYear:hover, #cw___calendarWin #cw___captionMonth:hover, #cw___calendarWin #cw___monthChange:hover {
+    color: rgb(51, 181, 229);
+}

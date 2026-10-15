@@ -1,0 +1,384 @@
+{
+   "blackList": {
+      "message": "Чёрный список"
+   },
+   "buttonHint": {
+      "message": "Больше не показывать"
+   },
+   "buttonInterval": {
+      "message": "Показать"
+   },
+   "captionOptions": {
+      "message": "Настройки"
+   },
+   "clearbrowsingdata": {
+      "message": "Очистить историю..."
+   },
+   "complete": {
+      "message": "готово"
+   },
+   "dateCaptionDefault": {
+      "message": "Всё"
+   },
+   "del10min": {
+      "message": "Последние 10 минут"
+   },
+   "del12hours": {
+      "message": "Последние 12 часов"
+   },
+   "del1day": {
+      "message": "Последние сутки"
+   },
+   "del1hour": {
+      "message": "Последний 1 час"
+   },
+   "del1month": {
+      "message": "Последний месяц"
+   },
+   "del7day": {
+      "message": "Последнюю неделю"
+   },
+   "delAll": {
+      "message": "Всю историю"
+   },
+   "delURL": {
+      "message": "Отправить URL в корзину"
+   },
+   "delURLclear": {
+      "message": "Очистить"
+   },
+   "delURLhint": {
+      "message": "Нажмите на \u003Cimg src='imgs/Delete.png' title='Отправить URL в корзину' width='16px' height='16px'/> для того что бы добавить URL в корзину."
+   },
+   "deleteAll": {
+      "message": "Отправить все URL в корзину"
+   },
+   "diag1": {
+      "message": "Статистика"
+   },
+   "diag10": {
+      "message": "Показать список самых посещаемых сайтов"
+   },
+   "diag11": {
+      "message": "Локальные файлы"
+   },
+   "diag12": {
+      "message": "Страницы настроек Chrome (about:*)"
+   },
+   "diag13": {
+      "message": "Страницы расширений Chrome"
+   },
+   "diag14": {
+      "message": "Всего посещений: "
+   },
+   "diag2": {
+      "message": "Год:"
+   },
+   "diag3": {
+      "message": "Месяц:"
+   },
+   "diag4": {
+      "message": "График уникальных URL: "
+   },
+   "diag5": {
+      "message": "Показать график уникальных URL"
+   },
+   "diag6": {
+      "message": "Фильтр: "
+   },
+   "diag7": {
+      "message": "фильтр - "
+   },
+   "diag8": {
+      "message": "График уникальных URL:"
+   },
+   "diag9": {
+      "message": "Список самых посещаемых сайтов:"
+   },
+   "extension_description": {
+      "description": "Description of the extension",
+      "message": "Удобный календарь для chrome://history/ позволяет просмотреть Историю за любой временной интервал. Так же есть возможность просмотра статистики по использованию браузера."
+   },
+   "firstMonday": {
+      "message": "true"
+   },
+   "hint1": {
+      "message": "Чтобы просмотреть журнал за определённый день, перейдите на вкладку 'Дата' и выберите число."
+   },
+   "hint2": {
+      "message": "Чтобы просмотреть всю историю целиком, перейдите на вкладку 'Всё'."
+   },
+   "hint3": {
+      "message": "Поиск осуществляется только по уже выбранному интервалу времени."
+   },
+   "hint4": {
+      "message": "Для просмотра истории за несколько дней используйте вкладку 'Интервал'."
+   },
+   "hint5": {
+      "message": " - клик по этому значку показывает окно с информацией о адресе."
+   },
+   "hint6": {
+      "message": "Для просмотра большего количества адресов используйте кнопку 'Ещё результаты' внизу страницы."
+   },
+   "historydomen": {
+      "message": "История посещений этого сайта"
+   },
+   "historyurl": {
+      "message": "История посещений этого адреса"
+   },
+   "i18n_blackListUrl_1": {
+      "message": "Стоп-слова в адресах сайтов:"
+   },
+   "i18n_blackListUrl_2": {
+      "message": "Все адреса, содержащие слова из этого списка, будут исключены из показа в истории. Однако, это не означает, что они будут удалены."
+   },
+   "i18n_blackListUrl_3": {
+      "message": "Одна строка = одно слово или адрес."
+   },
+   "i18n_blackListUrl_4": {
+      "message": "\u003Cb>Внимание: \u003C/b> чем больше слов в этом списке, тем медленнее работает просмотр истории."
+   },
+   "i18n_blackListUrl_5": {
+      "message": "Стоп-слова в заголовках сайтов:"
+   },
+   "i18n_blackListUrl_6": {
+      "message": "Все адреса содержащие в заголовке слова из этого списка будут исключены из показа в истории. Однако, это не означает, что они будут удалены."
+   },
+   "i18n_blackListUrl_7": {
+      "message": "Одна строка = одно слово или словосочетание."
+   },
+   "i18n_caption_selectDateType": {
+      "message": "Формат даты:"
+   },
+   "i18n_donate": {
+      "message": "Благодарность"
+   },
+   "i18n_donate_1": {
+      "message": "Поддержите проект History Calendar для браузера Google Chrome."
+   },
+   "i18n_donate_2": {
+      "message": "Ваша денежная помощь позволит в дальнейшем развиваться проекту."
+   },
+   "i18n_donate_3": {
+      "message": "Яндекс деньги:"
+   },
+   "i18n_donate_4": {
+      "message": "Счёт:"
+   },
+   "i18n_donate_5": {
+      "message": "Кошелёк:"
+   },
+   "i18n_misc": {
+      "message": "Разное"
+   },
+   "i18n_translate": {
+      "message": "Перевод"
+   },
+   "i18n_translate_1": {
+      "message": "Хотите пользоваться расширением на своём родном языке?"
+   },
+   "i18n_translate_2": {
+      "message": "Нашли неточность в переводе?"
+   },
+   "i18n_translate_3": {
+      "message": "Присылайте свои переводы по адресу"
+   },
+   "i18n_translate_4": {
+      "message": "Переводить нужно все фразы в кавычках после слова 'message:'"
+   },
+   "infURL": {
+      "message": "Информация о URL"
+   },
+   "interval": {
+      "message": "Дата: "
+   },
+   "intervalCaption1": {
+      "message": "Начиная с:"
+   },
+   "intervalCaption2": {
+      "message": "Заканчивая на:"
+   },
+   "l": {
+      "message": "ru"
+   },
+   "last10": {
+      "message": "Последние 10:"
+   },
+   "lastVisit": {
+      "message": "Последний визит"
+   },
+   "linkAllHistory": {
+      "message": "Показать всю историю..."
+   },
+   "month1": {
+      "message": "января"
+   },
+   "month10": {
+      "message": "октября"
+   },
+   "month11": {
+      "message": "ноября"
+   },
+   "month12": {
+      "message": "декабря"
+   },
+   "month2": {
+      "message": "февраля"
+   },
+   "month21": {
+      "message": "Январь"
+   },
+   "month210": {
+      "message": "Октябрь"
+   },
+   "month211": {
+      "message": "Ноябрь"
+   },
+   "month212": {
+      "message": "Декабрь"
+   },
+   "month22": {
+      "message": "Февраль"
+   },
+   "month23": {
+      "message": "Март"
+   },
+   "month24": {
+      "message": "Апрель"
+   },
+   "month25": {
+      "message": "Май"
+   },
+   "month26": {
+      "message": "Июнь"
+   },
+   "month27": {
+      "message": "Июль"
+   },
+   "month28": {
+      "message": "Август"
+   },
+   "month29": {
+      "message": "Сентябрь"
+   },
+   "month3": {
+      "message": "марта"
+   },
+   "month4": {
+      "message": "апреля"
+   },
+   "month5": {
+      "message": "мая"
+   },
+   "month6": {
+      "message": "июня"
+   },
+   "month7": {
+      "message": "июля"
+   },
+   "month8": {
+      "message": "августа"
+   },
+   "month9": {
+      "message": "сентября"
+   },
+   "more": {
+      "message": "Ещё результаты"
+   },
+   "noFind": {
+      "message": "Пусто"
+   },
+   "removeselected": {
+      "message": "Удалить выбранные элементы"
+   },
+   "resultCount": {
+      "message": "Количество результатов"
+   },
+   "saveButton": {
+      "message": "Сохранить"
+   },
+   "search": {
+      "message": "Найти"
+   },
+   "searchBoxText": {
+      "message": "Поиск"
+   },
+   "searchLabel": {
+      "message": "Показать историю в диапазоне дат:"
+   },
+   "searchPlaceholder": {
+      "message": "Поисковый запрос (необязательно)"
+   },
+   "searchinput": {
+      "message": "Искать в истории"
+   },
+   "stars5": {
+      "message": "Спасибо за то, что используете History Calendar! Не забудьте... выставить рейтинг 5 звёзд."
+   },
+   "tab0": {
+      "message": "Подсказка"
+   },
+   "tab1": {
+      "message": "Всё"
+   },
+   "tab2": {
+      "message": "Дата"
+   },
+   "tab3": {
+      "message": "Интервал"
+   },
+   "termText": {
+      "message": "Введите запрос или адрес сайта"
+   },
+   "title": {
+      "message": "История"
+   },
+   "titleOptions": {
+      "message": "История: Настройки"
+   },
+   "top20button": {
+      "message": "Топ 20, круговая диаграмма"
+   },
+   "week1": {
+      "message": "воскресенье"
+   },
+   "week2": {
+      "message": "понедельник"
+   },
+   "week21": {
+      "message": "вс"
+   },
+   "week22": {
+      "message": "пн"
+   },
+   "week23": {
+      "message": "вт"
+   },
+   "week24": {
+      "message": "ср"
+   },
+   "week25": {
+      "message": "чт"
+   },
+   "week26": {
+      "message": "пт"
+   },
+   "week27": {
+      "message": "сб"
+   },
+   "week3": {
+      "message": "вторник"
+   },
+   "week4": {
+      "message": "среда"
+   },
+   "week5": {
+      "message": "четверг"
+   },
+   "week6": {
+      "message": "пятница"
+   },
+   "week7": {
+      "message": "суббота"
+   }
+}
