@@ -10,6 +10,17 @@ const EMPTY_INFOBAR = ['\u00A0', '\u00A0', '?', '\u00A0'];
 const LEFT_ARROW = '\u25C0';
 const RIGHT_ARROW = '\u25B6';
 
+/** Single class that shows a picker; the closed state is the stylesheet's `display: none`. */
+const PICKER_OPEN = 'cw___picker--open';
+
+/* How the year picker's range is laid out around its pivot: the caption reads
+   `pivot − 7 … pivot + 10`, so the pivot itself sits on the eighth button. */
+const PICKER_YEARS_BEFORE = 7;
+const PICKER_YEARS_AFTER = 10;
+
+/** Year buttons in the year picker, and therefore the step its arrows move by. */
+const YEAR_BUTTON_COUNT = PICKER_YEARS_BEFORE + PICKER_YEARS_AFTER + 1;
+
 /**
  * Two `Date` objects denote the same day when their calendar fields agree. Compared this
  * way rather than by timestamp so a cell carrying a shifted day number — the spill cells
@@ -26,13 +37,19 @@ function isSameDay(left, right) {
 }
 
 /**
+ * @typedef {{element: EventTarget, type: string, handler: EventListener}} BoundListener
+ * one entry per `addEventListener` call this instance made, so `destroy()` can undo them
+ */
+
+/**
  * Calendar widget, rendered entirely from its private `#root` wrapper: the markup carries
  * no `id` attributes and no document-level query is ever issued, so several instances can
  * live on one page without colliding.
  *
- * Inline mode only for now — an `<input>` target throws. Every method below is
- * synchronous; nothing is deferred, because callers observe the DOM the moment a call
- * returns.
+ * A `div` target renders inline. An `input` target renders a date picker: the calendar is
+ * mounted in a wrapper this instance owns, parked to the right of the input and shown when
+ * the input takes focus. Every method below is synchronous; nothing is deferred, because
+ * callers observe the DOM the moment a call returns.
  */
 class Calendar {
     static {
@@ -56,8 +73,10 @@ class Calendar {
     }
 
     /** @type {HTMLElement} the target the caller named; its own id is left alone */
-    #host;
-    /** @type {HTMLElement} the wrapper this instance owns, rebuilt on every render */
+    #target;
+    /** @type {HTMLDivElement|null} popup wrapper this instance owns, null in inline mode */
+    #wrapper;
+    /** @type {HTMLDivElement|null} the calendar markup, rebuilt on every render */
     #root;
     /** @type {number} year currently drawn */
     #year;
@@ -77,6 +96,8 @@ class Calendar {
     #onFocus;
     /** @type {{year: number, month: number}} month and year the pickers navigate from */
     #pickup;
+    /** @type {BoundListener[]} */
+    #listeners = [];
 
     /**
      * @param {{
@@ -91,15 +112,16 @@ class Calendar {
      *     },
      *     onSelect?: (selected: {year: number, month: number, day: number}) => void,
      *     onFocus?: () => void
-     * }} options `target` is an element or a `#id` selector; `view.month` is 0-based;
-     *     `locale` falls back to the Russian Monday-first defaults.
-     * @throws {TypeError} when the target is missing, is not a div, or is an input
-     *     (popup mode is not implemented yet)
+     * }} options `target` is an element or a `#id` selector; a div renders inline, an
+     *     input renders a popup; `view.month` is 0-based; `locale` falls back to the
+     *     Russian Monday-first defaults.
+     * @throws {TypeError} when the target is missing, or is neither a div nor an input
      */
     constructor(options) {
         const { target, view, weekStartsOnMonday, showInfoBar, locale, onSelect, onFocus } = options;
 
-        this.#host = Calendar.#resolveTarget(target);
+        this.#target = Calendar.#resolveTarget(target);
+        this.#wrapper = this.#target.tagName === 'INPUT' ? this.#createWrapper() : null;
         this.#weekStartsOnMonday = weekStartsOnMonday;
         this.#showInfoBar = showInfoBar;
         this.#onSelect = onSelect ?? null;
@@ -111,6 +133,7 @@ class Calendar {
         this.#pickup = { year: view.year, month: view.month };
 
         this.#render();
+        this.#bindInputEvents();
     }
 
     /**
@@ -126,6 +149,10 @@ class Calendar {
      * @returns {true} always
      */
     setDateSelect(year, month, day) {
+        /* Before the guard: the popup has to have caught up with the input even when the
+           arguments turn out to be unusable. */
+        this.#positionPopup();
+
         if (!Calendar.#isInteger(year) || !Calendar.#isInteger(month) || !Calendar.#isInteger(day)) {
             return true;
         }
@@ -141,6 +168,7 @@ class Calendar {
             this.#onSelect({ ...this.#selected });
         }
 
+        this.#updateInfobar();
         return true;
     }
 
@@ -179,15 +207,15 @@ class Calendar {
      * constructor.
      *
      * @param {{
-     *     months: {nominative: string[], genitive: string[]},
-     *     weekdays: {short: string[], full: string[]},
+     *     months?: {nominative: string[], genitive: string[]},
+     *     weekdays?: {short: string[], full: string[]},
      *     completeText?: string,
      *     weekStartsOnMonday?: boolean
-     * }} locale omitting a field keeps the current value for it
+     * }} locale every field is optional; an absent one keeps the current value for it
      */
     setLocale(locale) {
         this.#locale = Calendar.#mergeLocale(locale);
-        this.#weekStartsOnMonday = locale.weekStartsOnMonday ?? this.#weekStartsOnMonday;
+        this.#weekStartsOnMonday = locale?.weekStartsOnMonday ?? this.#weekStartsOnMonday;
         this.#render();
     }
 
@@ -196,23 +224,27 @@ class Calendar {
      *     surrounding page still uses to address its own container
      */
     getTargetId() {
-        return this.#host.id;
+        return this.#target.id;
     }
 
-    /** Detaches the calendar's markup from the target and releases the instance. */
+    /** Detaches every listener, the popup wrapper and the markup, and releases the instance. */
     destroy() {
-        if (!this.#root) {
-            return;
+        for (const { element, type, handler } of this.#listeners) {
+            element.removeEventListener(type, handler);
         }
-        this.#root.remove();
+        this.#listeners.length = 0;
+
+        this.#root?.remove();
         this.#root = null;
+        this.#wrapper?.remove();
+        this.#wrapper = null;
     }
 
     /**
      * @param {HTMLElement|string} target element, or a `#id` selector for one
      * @returns {HTMLElement} the resolved element
-     * @throws {TypeError} when nothing matches, when the element is an input (popup mode
-     *     is not implemented yet) or when it is neither an input nor a div
+     * @throws {TypeError} when nothing matches, or when the element is neither an input
+     *     nor a div
      */
     static #resolveTarget(target) {
         const element = typeof target === 'string' ? document.querySelector(target) : target;
@@ -220,11 +252,8 @@ class Calendar {
         if (!element) {
             throw new TypeError('calendar target not found');
         }
-        if (element.tagName === 'INPUT') {
-            throw new TypeError('popup target not implemented');
-        }
-        if (element.tagName !== 'DIV') {
-            throw new TypeError('calendar target must be a div, got ' + element.tagName);
+        if (element.tagName !== 'INPUT' && element.tagName !== 'DIV') {
+            throw new TypeError('calendar target must be a div or an input, got ' + element.tagName);
         }
 
         return element;
@@ -254,14 +283,127 @@ class Calendar {
     }
 
     /**
-     * Rebuilds the whole calendar and swaps it into the target in one step, the way the
+     * @returns {HTMLDivElement} the popup wrapper. It carries `cw___absolute` beside its own
+     *     identity class: that utility class is what positions it absolutely, and it must
+     *     not also carry the root's `cw___calendar`, whose `position: relative` would then
+     *     apply to the wrapper as well.
+     */
+    #createWrapper() {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'cw___calendarHost cw___hide cw___absolute';
+        document.body.appendChild(wrapper);
+
+        return wrapper;
+    }
+
+    /** @returns {HTMLElement} the element the calendar is mounted into */
+    #mountPoint() {
+        return this.#wrapper ?? this.#target;
+    }
+
+    /**
+     * @param {EventTarget} element node the handler is attached to; kept so that
+     *     `destroy()` can undo the attachment later
+     * @param {string} type DOM event name
+     * @param {EventListener} handler
+     */
+    #bind(element, type, handler) {
+        element.addEventListener(type, handler);
+        this.#listeners.push({ element, type, handler });
+    }
+
+    /**
+     * Releases the handlers bound inside a root that is about to be discarded. Every render
+     * builds a new root, so without this the ledger would grow by one dead entry per render.
+     *
+     * @param {HTMLDivElement|null} root the root being replaced
+     */
+    #unbindRoot(root) {
+        if (!root) {
+            return;
+        }
+
+        this.#listeners = this.#listeners.filter((entry) => {
+            if (root.contains(entry.element)) {
+                root.removeEventListener(entry.type, entry.handler);
+                return false;
+            }
+            return true;
+        });
+    }
+
+    /**
+     * Wires the input and the document. Inline mode has none of this: an inline calendar is
+     * always visible and owns no listener outside its own markup.
+     */
+    #bindInputEvents() {
+        if (!this.#wrapper) {
+            return;
+        }
+
+        this.#bind(this.#target, 'focusin', () => {
+            this.#setVisible(true);
+            if (this.#onFocus) {
+                this.#onFocus();
+            }
+        });
+
+        this.#bind(this.#target, 'keydown', () => this.#setVisible(false));
+
+        /* Keeps a click inside the picker from reaching the page's own outside-click menu
+           handling, the way the legacy `mousedown` stopPropagation on the wrapper did. */
+        this.#bind(this.#wrapper, 'pointerdown', (event) => event.stopPropagation());
+
+        /* Scoped to this instance on purpose. The legacy code hid every calendar on the
+           page from a global body handler; only this instance's own markup is hidden here. */
+        this.#bind(document, 'pointerdown', (event) => {
+            if (!this.#root.contains(event.target)) {
+                this.#setVisible(false);
+            }
+        });
+    }
+
+    /** @param {boolean} visible whether the popup should be on screen; a no-op inline */
+    #setVisible(visible) {
+        this.#wrapper?.classList.toggle('cw___hide', !visible);
+    }
+
+    /**
+     * Parks the wrapper to the right of its input. Re-run on every render and at the head
+     * of `setDateSelect()`, so the popup keeps up with an input that scrolled away.
+     *
+     * The width counts horizontal margins, because the legacy read it from jQuery's
+     * `outerWidth(true)`; leaving them out moves the popup 36 px short on this page's
+     * date buttons.
+     */
+    #positionPopup() {
+        if (!this.#wrapper) {
+            return;
+        }
+
+        const style = getComputedStyle(this.#target);
+        const box = this.#target.getBoundingClientRect();
+
+        const width = ['width', 'paddingLeft', 'paddingRight', 'borderLeftWidth',
+            'borderRightWidth', 'marginLeft', 'marginRight']
+            .reduce((sum, property) => sum + parseFloat(style[property]), 0);
+
+        this.#wrapper.style.left = (box.left + globalThis.scrollX + width + 1) + 'px';
+        this.#wrapper.style.top = (box.top + globalThis.scrollY) + 'px';
+    }
+
+    /**
+     * Rebuilds the whole calendar and swaps it into its mount point in one step, the way the
      * legacy code emptied its container before each draw. Replacing the wrapper itself
      * rather than its contents keeps stale nodes from the previous render out of the
-     * queries below.
+     * queries below — and with them the handlers bound on it.
      */
     #render() {
+        this.#positionPopup();
+        this.#unbindRoot(this.#root);
+
         this.#root = this.#buildCalendar();
-        this.#host.replaceChildren(this.#root);
+        this.#mountPoint().replaceChildren(this.#root);
 
         this.#updateInfobar();
 
@@ -269,28 +411,265 @@ class Calendar {
         if (!this.#showInfoBar) {
             this.#root.querySelector('table').style.marginTop = '0';
         }
+
+        this.#bindEvents();
     }
 
     /**
-     * @returns {HTMLElement} the wrapper holding infobar, table and the two pickers, in
-     *     that order
+     * One delegated handler for everything inside the calendar: the day cells alone are 42
+     * per render, and binding each of them would cost more than resolving which one was
+     * clicked. The arrows carry no class of their own — their identity is their position in
+     * the header row and in each picker's control row — so they are matched positionally.
+     */
+    #bindEvents() {
+        const root = this.#root;
+        const header = root.querySelector('table tr');
+        const monthControl = root.querySelector('.cw___picker--month .cw___monthControl');
+        const yearControl = root.querySelector('.cw___picker--year .cw___monthControl');
+        const complete = root.querySelector('.cw___buttonComplete');
+
+        if (complete) {
+            this.#bind(complete, 'click', () => this.#setVisible(false));
+        }
+
+        this.#bind(root, 'click', (event) => {
+            const target = event.target;
+
+            const dayCell = target.closest('.cw___active');
+            if (dayCell) {
+                this.#selectDay(dayCell);
+                return;
+            }
+
+            const monthButton = target.closest('.cw___monthButton');
+            if (monthButton) {
+                this.#pickMonth(monthButton);
+                return;
+            }
+
+            const yearButton = target.closest('.cw___yearButton');
+            if (yearButton) {
+                this.#pickYear(yearButton);
+                return;
+            }
+
+            const caption = target.closest('.cw___captionMonth, .cw___captionYear, .cw___monthChange');
+            if (caption) {
+                if (caption.classList.contains('cw___monthChange')) {
+                    this.#openMonthPicker();
+                } else if (caption.classList.contains('cw___captionMonth')) {
+                    this.#openYearPicker();
+                } else {
+                    this.#resetPickupToToday();
+                }
+                return;
+            }
+
+            const arrow = target.closest('.cw___buttonJump');
+            if (arrow === header.children[0].firstElementChild) {
+                this.#pageMonth(-1);
+            } else if (arrow === header.children[2].firstElementChild) {
+                this.#pageMonth(1);
+            } else if (arrow === monthControl.children[0]) {
+                this.#shiftPickupYear(-1);
+            } else if (arrow === monthControl.children[2]) {
+                this.#shiftPickupYear(1);
+            } else if (arrow === yearControl.children[0]) {
+                this.#shiftPickupYear(-YEAR_BUTTON_COUNT);
+            } else if (arrow === yearControl.children[2]) {
+                this.#shiftPickupYear(YEAR_BUTTON_COUNT);
+            }
+        });
+    }
+
+    /**
+     * @returns {HTMLDivElement} the month overlay, the second-to-last child of the root
+     */
+    #monthPicker() {
+        return this.#root.querySelector('.cw___picker--month');
+    }
+
+    /**
+     * @returns {HTMLDivElement} the year overlay, the last child of the root
+     */
+    #yearPicker() {
+        return this.#root.querySelector('.cw___picker--year');
+    }
+
+    /**
+     * Redraws both pickers around `#pickup`: their captions, the year range they offer and
+     * the marks for today and for the selected date. A button can end up carrying both
+     * marks at once, which is what happens on the current date itself.
+     */
+    #updatePicker() {
+        const pivot = this.#pickup.year;
+        const now = new Date();
+
+        this.#root.querySelector('.cw___captionMonth').textContent = String(pivot);
+        this.#root.querySelector('.cw___captionYear').textContent =
+            (pivot - PICKER_YEARS_BEFORE) + ' — ' + (pivot + PICKER_YEARS_AFTER);
+
+        for (const button of this.#root.querySelectorAll('.cw___monthButton')) {
+            const month = Number(button.getAttribute('data-month'));
+
+            button.classList.remove('cw___selectedMonth', 'cw___now');
+            if (pivot === this.#selected.year && month === this.#selected.month) {
+                button.classList.add('cw___selectedMonth');
+            }
+            if (pivot === now.getFullYear() && month === now.getMonth()) {
+                button.classList.add('cw___now');
+            }
+        }
+
+        const first = pivot - PICKER_YEARS_BEFORE;
+        this.#root.querySelectorAll('.cw___yearButton').forEach((button, index) => {
+            const year = first + index;
+
+            button.classList.remove('cw___selectedYear', 'cw___now');
+            button.setAttribute('data-year', String(year));
+            button.textContent = String(year);
+
+            if (year === now.getFullYear()) {
+                button.classList.add('cw___now');
+            }
+            if (year === this.#selected.year) {
+                button.classList.add('cw___selectedYear');
+            }
+        });
+    }
+
+    /** Caption of the month picker: opens it, re-anchored on the month being drawn. */
+    #openMonthPicker() {
+        this.#normalizeIntegers();
+        this.#pickup.year = this.#year;
+        this.#pickup.month = this.#month;
+        this.#updatePicker();
+        this.#monthPicker().classList.add(PICKER_OPEN);
+    }
+
+    /**
+     * Caption of the month picker, read as "pick a year instead": opens the year overlay,
+     * which is drawn against whatever pivot the month overlay has reached so far.
+     */
+    #openYearPicker() {
+        this.#yearPicker().classList.add(PICKER_OPEN);
+    }
+
+    /**
+     * @param {HTMLElement} button month button, whose `data-month` is the month to draw
+     */
+    #pickMonth(button) {
+        this.#pickup.month = Number(button.getAttribute('data-month'));
+        this.#month = this.#pickup.month;
+        this.#year = this.#pickup.year;
+        this.#render();
+    }
+
+    /**
+     * @param {HTMLElement} button year button, whose `data-year` is the year to draw
+     */
+    #pickYear(button) {
+        this.#pickup.year = Number(button.getAttribute('data-year'));
+        this.#year = this.#pickup.year;
+        this.#updatePicker();
+        this.#yearPicker().classList.remove(PICKER_OPEN);
+    }
+
+    /**
+     * @param {number} by how many years the picker captions move; the year picker's arrows
+     *     step by its whole width, so the range on screen changes wholesale
+     */
+    #shiftPickupYear(by) {
+        this.#pickup.year += by;
+        this.#updatePicker();
+    }
+
+    /** Caption of the year picker: jumps the range back to today, opening nothing. */
+    #resetPickupToToday() {
+        const now = new Date();
+        this.#pickup.year = now.getFullYear();
+        this.#pickup.month = now.getMonth();
+        this.#updatePicker();
+    }
+
+    /**
+     * @param {number} by -1 for the header's left arrow, 1 for its right
+     */
+    #pageMonth(by) {
+        this.#normalizeIntegers();
+        this.#month += by;
+
+        if (by < 0) {
+            if (this.#month === -1) {
+                this.#month = 11;
+                this.#year -= 1;
+            }
+        } else if (this.#month > 11) {
+            const years = this.#month / 12 >> 0;
+            this.#month %= 12;
+            this.#year += years;
+        }
+
+        this.#render();
+    }
+
+    /**
+     * @param {HTMLElement} cell day cell, whose `data-date` is the date it displays
+     */
+    #selectDay(cell) {
+        const [year, month, day] = cell.getAttribute('data-date').split('.').map(Number);
+
+        this.#selected.year = year;
+        this.#selected.month = month;
+        this.#selected.day = day;
+        this.#repaintSelected();
+
+        /* Strings on purpose: the legacy day click left the drawn month as the raw
+           `data-date` parts and the paging handlers normalised them. */
+        this.#year = String(year);
+        this.#month = String(month);
+
+        if (this.#onSelect) {
+            this.#onSelect({ ...this.#selected });
+        }
+
+        this.#updateInfobar();
+        this.#render();
+    }
+
+    /**
+     * Forces every field that a click may have left as a string back to a number, so the
+     * arithmetic in the paging and caption handlers can rely on it.
+     */
+    #normalizeIntegers() {
+        this.#selected.year *= 1;
+        this.#selected.month *= 1;
+        this.#selected.day *= 1;
+        this.#year *= 1;
+        this.#month *= 1;
+    }
+
+    /**
+     * @returns {HTMLDivElement} the wrapper holding infobar, table, the complete button and
+     *     the two pickers, in that order
      */
     #buildCalendar() {
         const calendar = document.createElement('div');
-        calendar.className = 'cw___calendar';
+        const popup = this.#wrapper !== null;
+        calendar.className = popup ? 'cw___calendar cw___shadow' : 'cw___calendar';
 
-        calendar.append(
-            this.#buildInfobar(),
-            this.#buildTable(),
-            this.#buildMonthPicker(),
-            this.#buildYearPicker()
-        );
+        const children = [this.#buildInfobar(), this.#buildTable()];
+        if (popup) {
+            children.push(this.#buildCompleteButton());
+        }
+        children.push(this.#buildMonthPicker(), this.#buildYearPicker());
+        calendar.append(...children);
 
         return calendar;
     }
 
     /**
-     * @returns {HTMLElement} the four-field bar above the grid
+     * @returns {HTMLDivElement} the four-field bar above the grid
      */
     #buildInfobar() {
         const infobar = document.createElement('div');
@@ -311,6 +690,17 @@ class Calendar {
         });
 
         return infobar;
+    }
+
+    /**
+     * @returns {HTMLDivElement} the button that closes a popup; it has no inline counterpart
+     */
+    #buildCompleteButton() {
+        const button = document.createElement('div');
+        button.className = 'cw___buttonComplete';
+        button.textContent = this.#locale.completeText;
+
+        return button;
     }
 
     /**
@@ -460,11 +850,10 @@ class Calendar {
     }
 
     /**
-     * @returns {HTMLElement} the hidden month picker
+     * @returns {HTMLDivElement} the hidden month picker
      */
     #buildMonthPicker() {
-        const picker = document.createElement('div');
-        picker.className = 'cw___picker cw___picker--month';
+        const picker = this.#createPicker('cw___picker--month');
         picker.appendChild(this.#buildPickerControl('cw___captionMonth'));
 
         /* Zig-zag, not 0..11: the grid is two columns of six, so DOM order fills the
@@ -482,16 +871,15 @@ class Calendar {
     }
 
     /**
-     * @returns {HTMLElement} the hidden year picker
+     * @returns {HTMLDivElement} the hidden year picker
      */
     #buildYearPicker() {
-        const picker = document.createElement('div');
-        picker.className = 'cw___picker cw___picker--year';
+        const picker = this.#createPicker('cw___picker--year');
         picker.appendChild(this.#buildPickerControl('cw___captionYear'));
 
         /* 2000..2017: the range the picker opens on before it has been told which year to
            centre on, which is the state every render starts from. */
-        for (let year = 2000; year <= 2017; year++) {
+        for (let year = 2000; year < 2000 + YEAR_BUTTON_COUNT; year++) {
             picker.appendChild(
                 this.#buildPickerButton('cw___yearButton', 'data-year', year - 2000, String(year))
             );
@@ -501,9 +889,23 @@ class Calendar {
     }
 
     /**
+     * @param {string} variant which of the two pickers is being built
+     * @returns {HTMLDivElement} the picker shell. A popup's pickers are offset upwards, to
+     *     clear the complete button that sits below the grid.
+     */
+    #createPicker(variant) {
+        const picker = document.createElement('div');
+        picker.className = this.#wrapper
+            ? 'cw___picker ' + variant + ' cw___picker--offset'
+            : 'cw___picker ' + variant;
+
+        return picker;
+    }
+
+    /**
      * @param {string} captionClass identity class of the caption, which differs between
      *     the two pickers
-     * @returns {HTMLElement} the arrows-and-caption row every picker opens with
+     * @returns {HTMLDivElement} the arrows-and-caption row every picker opens with
      */
     #buildPickerControl(captionClass) {
         const control = document.createElement('div');
@@ -524,7 +926,7 @@ class Calendar {
 
     /**
      * @param {string} glyph arrow to draw
-     * @returns {HTMLElement}
+     * @returns {HTMLDivElement}
      */
     #buildPickerArrow(glyph) {
         const arrow = document.createElement('div');
@@ -535,11 +937,12 @@ class Calendar {
     }
 
     /**
-     * @param {string} className
-     * @param {string} attribute numeric attribute carrying the button's own value
-     * @param {number} value
+     * @param {string} className identity class the picker's buttons are found by
+     * @param {string} attribute name of the attribute carrying the button's own value; it
+     *     is what a click reads back, so it is the picker's addressing scheme
+     * @param {number|string} value initial value, stored as text
      * @param {string} label text the button shows
-     * @returns {HTMLElement}
+     * @returns {HTMLDivElement}
      */
     #buildPickerButton(className, attribute, value, label) {
         const button = document.createElement('div');
