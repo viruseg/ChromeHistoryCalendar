@@ -78,9 +78,13 @@ class Calendar {
     #wrapper;
     /** @type {HTMLDivElement|null} the calendar markup, rebuilt on every render */
     #root;
-    /** @type {number} year currently drawn */
+    /**
+     * @type {number} year currently drawn. A number at every assignment, never a numeric
+     *     string: the grid's day count and the paging arrows both do arithmetic on these two
+     *     fields, so a string arriving here silently reads another month's day count
+     */
     #year;
-    /** @type {number} month currently drawn, 0-based */
+    /** @type {number} month currently drawn, 0-based, and a number for the same reason */
     #month;
     /** @type {{year: number, month: number, day: number}} */
     #selected;
@@ -128,9 +132,11 @@ class Calendar {
         this.#onFocus = onFocus ?? null;
         this.#locale = Calendar.#mergeLocale(locale, Calendar.#defaults());
         this.#selected = { year: 0, month: 0, day: 0 };
-        this.#year = view.year;
-        this.#month = view.month;
-        this.#pickup = { year: view.year, month: view.month };
+        /* Coerced here because the picker's pivot is seeded from these two fields too, and
+           every writer downstream copies rather than re-coerces. */
+        this.#year = view.year * 1;
+        this.#month = view.month * 1;
+        this.#pickup = { year: this.#year, month: this.#month };
 
         this.#render();
         this.#bindInputEvents();
@@ -157,9 +163,11 @@ class Calendar {
             return true;
         }
 
+        /* Past the guard, so the numeric strings `#isInteger` accepts on purpose are still
+           taken — but only as numbers, since the drawn month is arithmetic from here on. */
         this.#selected = { year: year * 1, month: month * 1, day: day * 1 };
-        this.#year = year;
-        this.#month = month;
+        this.#year = this.#selected.year;
+        this.#month = this.#selected.month;
         this.#render();
 
         /* Fired after the re-render, not before: history.js queries on the strength of
@@ -573,7 +581,6 @@ class Calendar {
 
     /** Caption of the month picker: opens it, re-anchored on the month being drawn. */
     #openMonthPicker() {
-        this.#normalizeIntegers();
         this.#pickup.year = this.#year;
         this.#pickup.month = this.#month;
         this.#updatePicker();
@@ -629,7 +636,6 @@ class Calendar {
      * @param {number} by -1 for the header's left arrow, 1 for its right
      */
     #pageMonth(by) {
-        this.#normalizeIntegers();
         this.#month += by;
 
         if (by < 0) {
@@ -657,10 +663,11 @@ class Calendar {
         this.#selected.day = day;
         this.#repaintSelected();
 
-        /* Strings on purpose: the legacy day click left the drawn month as the raw
-           `data-date` parts and the paging handlers normalised them. */
-        this.#year = String(year);
-        this.#month = String(month);
+        /* Numbers, as `.map(Number)` already made them. The legacy click stored the raw
+           `data-date` parts here and left the paging handlers to coerce them back; nothing
+           coerces any more, so a string would reach `#buildTable`'s day count as one. */
+        this.#year = year;
+        this.#month = month;
 
         if (this.#onSelect) {
             this.#onSelect({ ...this.#selected });
@@ -668,18 +675,6 @@ class Calendar {
 
         this.#updateInfobar();
         this.#render();
-    }
-
-    /**
-     * Forces every field that a click may have left as a string back to a number, so the
-     * arithmetic in the paging and caption handlers can rely on it.
-     */
-    #normalizeIntegers() {
-        this.#selected.year *= 1;
-        this.#selected.month *= 1;
-        this.#selected.day *= 1;
-        this.#year *= 1;
-        this.#month *= 1;
     }
 
     /**
