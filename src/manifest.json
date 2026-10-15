@@ -7,9 +7,9 @@
    "icons": {
       "128": "icon-128.png"
    },
-   "manifest_version": 2,
+   "manifest_version": 3,
+   "minimum_chrome_version": "104",
    "name": "History Calendar",
-   "permissions": [ "history", "chrome://favicon/", "tabs" ],
-   "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "1.0.0"
+   "permissions": [ "history", "favicon" ],
+   "version": "1.1.0"
 }

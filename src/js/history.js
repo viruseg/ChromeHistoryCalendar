@@ -445,6 +445,16 @@ function getArrVisitsUrl(url) {
     })
 }
 
+/**
+ * Builds a URL of the site's icon served by the extension's `_favicon` endpoint.
+ *
+ * @param {string} pageUrl - Address of the site whose icon is needed.
+ * @returns {string} Absolute URL usable as a CSS `background-image` value.
+ */
+function getFaviconUrl(pageUrl) {
+    return chrome.runtime.getURL('/_favicon/') + '?pageUrl=' + encodeURIComponent(pageUrl) + '&size=16';
+}
+
 function prepareHtml(date, url, title, domen, time) {
     var timeStr = '';
     if (time > 0) {
@@ -467,7 +477,7 @@ function prepareHtml(date, url, title, domen, time) {
                     <div class="time" title="' + hint + '">' + date + '</div>\
                     <input type="checkbox" class="chk" a-url="' + url + '"' + timeStr + '>\
                     <a href="' + url + '"  target="_blank">\
-                        <div class="icon" style="background-image: url(\'chrome://favicon/size/16@1x/' + url + '\');"></div>\
+                        <div class="icon" style="background-image: url(\'' + getFaviconUrl(url) + '\');"></div>\
                         <div class="head">' + HTML.encode(title) + '</div>\
                         <div class="url">' + urlDecoded + '</div>\
                     </a>\
