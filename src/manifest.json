@@ -8,7 +8,7 @@
       "128": "icon-128.png"
    },
    "manifest_version": 3,
-   "minimum_chrome_version": "104",
+   "minimum_chrome_version": "155",
    "name": "History Calendar",
    "permissions": [ "history", "favicon" ],
    "version": "1.1.0"
