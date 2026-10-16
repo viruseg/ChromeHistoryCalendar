@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Dependency-free regression check for the calendar grid invariants.
+ * Dependency-free regression check for the calendar grid and picker invariants.
  *
  *     node tools/check-calendar-grid.mjs
  *     node tools/check-calendar-grid.mjs path/to/other-calendar.js
@@ -9,17 +9,18 @@
  * Loads `src/js/calendar.js` — a classic script, not a module — into a `node:vm` context
  * that carries a minimal DOM stub, drives a real `Calendar` through a matrix of months,
  * orientations and mount modes, and asserts the grid invariants on every render it
- * produces. Exits non-zero if any invariant fails or if any harness self-check fails.
+ * produces. A second matrix then opens both pickers from their own captions, clicks their
+ * buttons and presses their arrows. Exits non-zero if any invariant fails or if any
+ * harness self-check fails.
  *
- * The DOM stub is described in `class StubElement`; the invariants are in
- * `inspectGrid`. Both are deliberately small so that a passing run is evidence rather
- * than a tautology — the harness proves it can fail before it is allowed to report
- * success (see the self-checks in `runMatrix`).
+ * The DOM stub is described in `class StubElement`; the invariants are in `inspectGrid` and
+ * `inspectPickers`. Both are deliberately small so that a passing run is evidence rather
+ * than a tautology — the harness proves it can fail before it is allowed to report success
+ * (see the canaries in `runMatrix` and `runPickerMatrix`).
  *
- * Known state at the time of writing: this check FAILS on the current `calendar.js`.
- * `#selectDay` leaves `#month` a string, so `#buildTable` counts days with
- * `this.#month + 1` string concatenation and marks days that belong to the next month.
- * Fix that in `calendar.js`, never by relaxing an invariant here.
+ * What the stub cannot see: layout, styles, focus, and anything asynchronous. The `cw___now`
+ * mark depends on the wall clock and is therefore never asserted on its own. Fix a real
+ * defect in `calendar.js`, never by relaxing an invariant here.
  */
 
 import { readFileSync } from 'node:fs';
@@ -885,14 +886,779 @@ function runMatrix(runtime) {
     return { specs, cases, coverage, canary: canaryResult, harnessProblems, probeSpec, numericFailures, clickFailures };
 }
 
+/* ---------------------------------------------------------------- picker invariants */
+
+/** Years a picker offers before its pivot, and years after it. */
+const PICKER_YEARS_BEFORE = 7;
+const PICKER_YEARS_AFTER = 10;
+
+/** Year buttons the year picker draws — which is also the step its arrows have to take. */
+const PICKER_YEAR_BUTTONS = PICKER_YEARS_BEFORE + PICKER_YEARS_AFTER + 1;
+
+/** The single class that shows a picker; the closed state is the stylesheet's `display: none`. */
+const PICKER_OPEN = 'cw___picker--open';
+
+/** Caption text `#buildPickerControl` writes before any picker has been told a pivot. */
+const DORMANT_CAPTION = '-';
+
+/** Years and months the picker matrix walks: a leap February, a plain one, both year edges. */
+const PICKER_YEARS = [1999, 2000, 2026, 2027];
+const PICKER_MONTHS = [0, 1, 6, 11];
+
+/** @param {StubElement|null} element @returns {boolean} */
+function pickerIsOpen(element) {
+    return element !== null && element.classList.contains(PICKER_OPEN);
+}
+
+/**
+ * Reads a caption of the shape `<first> — <last>`, whatever separator it is written with.
+ *
+ * The placeholder matches nothing, which is the point: a caption still reading `-` carries no
+ * years and must never satisfy an expectation about a range.
+ *
+ * @param {string} text
+ * @returns {{first: number|null, last: number|null, separator: string|null}}
+ */
+function readRangeCaption(text) {
+    const match = /^(\d+)\s*(\S+)\s*(\d+)$/.exec(text);
+    if (match === null) {
+        return { first: null, last: null, separator: null };
+    }
+
+    return { first: Number(match[1]), last: Number(match[3]), separator: match[2] };
+}
+
+/**
+ * The two picker captions and the years the year buttons are addressed by, as one value.
+ *
+ * @param {StubDocument} document
+ * @returns {{month: string, range: string, first: number|null, last: number|null, years: string[]}}
+ */
+function readPickerState(document) {
+    const month = document.querySelector('.cw___captionMonth');
+    const range = document.querySelector('.cw___captionYear');
+    const parsed = readRangeCaption(range === null ? '' : range.textContent);
+
+    return {
+        month: month === null ? '' : month.textContent,
+        range: range === null ? '' : range.textContent,
+        first: parsed.first,
+        last: parsed.last,
+        years: document.querySelectorAll('.cw___yearButton').map(button => button.getAttribute('data-year') ?? '')
+    };
+}
+
+/**
+ * The arrows of one picker's control row, found the way `calendar.js` finds them: positionally,
+ * first and third child, because the arrows carry no class telling the two pickers apart.
+ *
+ * @param {StubDocument} document
+ * @param {'month'|'year'} which
+ * @returns {{left: StubElement|null, right: StubElement|null}}
+ */
+function pickerArrows(document, which) {
+    const control = document.querySelector(`.cw___picker--${which} .cw___monthControl`);
+    if (control === null) {
+        return { left: null, right: null };
+    }
+
+    return { left: control.children[0] ?? null, right: control.children[2] ?? null };
+}
+
+/**
+ * Asserts everything both pickers are responsible for at one moment: which overlay is showing,
+ * what its captions say, how its buttons are addressed, and where the selection marks land.
+ *
+ * The expectations are derived from `pivot` and `selection` alone, never from what the picker
+ * currently shows, so a stale pivot and a stale mark are both failures rather than agreement.
+ *
+ * @param {{
+ *     document: StubDocument,
+ *     pivot: number,
+ *     selection: {year: number, month: number, day: number}|null,
+ *     monthOpen: boolean,
+ *     yearOpen: boolean,
+ *     monthNames: string[]
+ * }} input
+ * @param {{monthMark: number, noMonthMark: number, yearMark: number, noYearMark: number}|null} [branches]
+ *     tally of which mark branch this state exercised; both branches have to be reached, or an
+ *     expectation of "no mark" would be passing because nothing ever asks for one
+ * @returns {CheckResult[]}
+ */
+function inspectPickers({ document, pivot, selection, monthOpen, yearOpen, monthNames }, branches = null) {
+    const results = [];
+    const record = (name, ok, detail = '', skipped = false) => {
+        results.push({ name, ok, detail, skipped });
+    };
+
+    const monthPicker = document.querySelector('.cw___picker--month');
+    const yearPicker = document.querySelector('.cw___picker--year');
+    if (monthPicker === null || yearPicker === null) {
+        record('pickersPresent', false,
+            `month picker ${monthPicker === null ? 'missing' : 'present'},`
+            + ` year picker ${yearPicker === null ? 'missing' : 'present'}`);
+        return results;
+    }
+    record('pickersPresent', true, 'both overlays are in the root');
+
+    const monthState = pickerIsOpen(monthPicker) ? 'open' : 'closed';
+    const yearState = pickerIsOpen(yearPicker) ? 'open' : 'closed';
+    record('pickerOpenState',
+        monthState === (monthOpen ? 'open' : 'closed') && yearState === (yearOpen ? 'open' : 'closed'),
+        `month picker ${monthState}, year picker ${yearState};`
+            + ` expected ${monthOpen ? 'open' : 'closed'} and ${yearOpen ? 'open' : 'closed'}`);
+
+    for (const [which, picker, captionClass] of [
+        ['month', monthPicker, 'cw___captionMonth'],
+        ['year', yearPicker, 'cw___captionYear']
+    ]) {
+        const control = picker.querySelector('.cw___monthControl');
+        const children = control === null ? [] : control.children;
+        record('pickerControlRow',
+            children.length === 3
+                && children[0].classList.contains('cw___buttonJump')
+                && children[2].classList.contains('cw___buttonJump')
+                && children[1].classList.contains(captionClass),
+            `${which} control: ${children.length} children, [${children.map(child => child.className).join(' | ')}]`);
+    }
+
+    const first = pivot - PICKER_YEARS_BEFORE;
+    const last = pivot + PICKER_YEARS_AFTER;
+
+    const monthCaption = monthPicker.querySelector('.cw___captionMonth');
+    const monthText = monthCaption === null ? '' : monthCaption.textContent;
+    record('monthPickerCaption', monthText === String(pivot),
+        `month caption reads "${monthText}", expected the pivot "${pivot}"`);
+
+    const yearCaption = yearPicker.querySelector('.cw___captionYear');
+    const yearText = yearCaption === null ? '' : yearCaption.textContent;
+    const range = readRangeCaption(yearText);
+    record('yearPickerCaption', range.first === first && range.last === last,
+        `year caption reads "${yearText}", expected the pivot range ${first} … ${last}`);
+
+    record('captionPopulated', monthText !== DORMANT_CAPTION && range.first !== null,
+        `month caption "${monthText}", year caption "${yearText}";`
+        + ` a caption still reading "${DORMANT_CAPTION}" was never told a pivot`);
+
+    const yearButtons = yearPicker.querySelectorAll('.cw___yearButton');
+    record('yearButtonCount', yearButtons.length === PICKER_YEAR_BUTTONS,
+        `${yearButtons.length} year buttons, expected ${PICKER_YEAR_BUTTONS}`);
+
+    const carried = yearButtons.map(button => button.getAttribute('data-year'));
+    const indexed = carried.every((value, index) => value === String(index));
+    record('yearButtonDataYear', carried.every((value, index) => Number(value) === first + index),
+        `data-year [${preview(carried, 4)}], expected ${first}…${last}`
+        + `${indexed ? ' — these are the 0..17 indices, not years' : ''}`);
+
+    const relabelled = carried
+        .map((value, index) => (yearButtons[index].textContent === value ? null : `${value}/${yearButtons[index].textContent}`))
+        .filter(entry => entry !== null);
+    record('yearButtonLabel', relabelled.length === 0,
+        relabelled.length === 0
+            ? `every year button reads the year it is addressed by`
+            : `${relabelled.length}/${yearButtons.length} year buttons read something else: ${preview(relabelled)}`);
+
+    const monthButtons = monthPicker.querySelectorAll('.cw___monthButton');
+    const months = monthButtons.map(button => button.getAttribute('data-month'));
+    const addressed = MONTHS.every(month => months.filter(value => Number(value) === month).length === 1);
+    record('monthButtonCount', monthButtons.length === 12 && addressed,
+        `${monthButtons.length} month buttons, data-month [${preview(months, 6)}]`);
+
+    const misnamed = [];
+    monthButtons.forEach((button, index) => {
+        const month = Number(months[index]);
+        if (button.textContent !== monthNames[month]) {
+            misnamed.push(`${month}: ${button.textContent}`);
+        }
+    });
+    record('monthButtonLabel', misnamed.length === 0,
+        misnamed.length === 0
+            ? `every month button reads the month it is addressed by`
+            : `${misnamed.length} month buttons read another month's name: ${preview(misnamed)}`);
+
+    const markedMonths = monthPicker.querySelectorAll('.cw___selectedMonth');
+    const monthMarkWanted = selection !== null && selection.year === pivot;
+    if (branches !== null) {
+        branches[monthMarkWanted ? 'monthMark' : 'noMonthMark'] += 1;
+    }
+    record('selectedMonthMark',
+        markedMonths.length === (monthMarkWanted ? 1 : 0)
+            && (!monthMarkWanted || Number(markedMonths[0].getAttribute('data-month')) === selection.month),
+        monthMarkWanted
+            ? `${markedMonths.length} month buttons marked, expected 1 on data-month ${selection.month}`
+            : `${markedMonths.length} month buttons marked, expected none`
+                + (selection === null ? ' (nothing is selected)' : ` (selection is in ${selection.year}, the pivot is ${pivot})`));
+
+    const markedYears = yearPicker.querySelectorAll('.cw___selectedYear');
+    const yearMarkWanted = selection !== null && selection.year >= first && selection.year <= last;
+    if (branches !== null) {
+        branches[yearMarkWanted ? 'yearMark' : 'noYearMark'] += 1;
+    }
+    record('selectedYearMark',
+        markedYears.length === (yearMarkWanted ? 1 : 0)
+            && (!yearMarkWanted || Number(markedYears[0].getAttribute('data-year')) === selection.year),
+        yearMarkWanted
+            ? `${markedYears.length} year buttons marked, expected 1 on ${selection.year}`
+            : `${markedYears.length} year buttons marked, expected none`
+                + (selection === null
+                    ? ' (nothing is selected)'
+                    : ` (${selection.year} is outside ${first} … ${last})`));
+
+    return results;
+}
+
+/* ---------------------------------------------------------------------- the picker matrix */
+
+/**
+ * Drives one calendar through the picker paths a pointer can take: opening each overlay from
+ * its own caption, choosing a month, choosing a year, paging the pivot with all four arrows,
+ * and marking — then clearing — a selection.
+ *
+ * Every control is looked up again after each action: `#render()` replaces the whole root, so
+ * a node held across an action is detached from the calendar and clicks on it would never
+ * reach the delegated handler.
+ *
+ * @param {{Calendar: Function, freshDocument: () => StubDocument}} runtime
+ * @param {CaseSpec} spec
+ * @returns {{phases: {label: string, checks: CheckResult[]}[], harness: string[], branches: object}}
+ */
+function runPickerCase(runtime, spec) {
+    const phases = [];
+    const harness = [];
+    const branches = { monthMark: 0, noMonthMark: 0, yearMark: 0, noYearMark: 0 };
+    const pivot = spec.year;
+    const first = pivot - PICKER_YEARS_BEFORE;
+    const selection = { year: spec.year, month: spec.month };
+    const day = Math.min(15, new Date(spec.year, spec.month + 1, 0).getDate());
+
+    const newCalendar = () => {
+        const document = runtime.freshDocument();
+        const { calendar } = mount(document, runtime.Calendar, spec);
+        return { document, calendar };
+    };
+
+    /** Clicks a control, recording the failure rather than throwing when nothing matches. */
+    const press = (document, selector, checks, what) => {
+        const element = document.querySelector(selector);
+        if (element === null) {
+            checks.push({
+                name: 'pickerControlPresent',
+                ok: false,
+                detail: `${what}: nothing matches ${selector}`,
+                skipped: false
+            });
+            harness.push(`${what}: nothing matches ${selector}`);
+            return null;
+        }
+
+        element.dispatchEvent({ type: 'click', target: element });
+        return element;
+    };
+
+    const phase = (label, checks) => phases.push({ label, checks });
+    const inspect = (document, over) => inspectPickers({
+        document,
+        pivot,
+        selection: null,
+        monthOpen: true,
+        yearOpen: false,
+        monthNames: spec.monthNames,
+        ...over
+    }, branches);
+
+    {
+        const { document } = newCalendar();
+        const opened = [];
+        press(document, '.cw___monthChange', opened, 'opening the month picker');
+        phase('month picker open', [...opened, ...inspect(document)]);
+
+        const intoYear = [];
+        press(document, '.cw___captionMonth', intoYear, 'opening the year picker');
+        phase('year picker open', [...intoYear, ...inspect(document, { yearOpen: true })]);
+    }
+
+    /* The path `#openYearPicker()` has to survive on its own: a root that has never been told
+       a pivot, reached straight from the month picker's caption. Before `#updatePicker()` was
+       called there too, this left the caption at `-` with `data-year` running `0..17`, so a
+       click on any button landed on year 0. */
+    {
+        const { document } = newCalendar();
+        const checks = [];
+        press(document, '.cw___captionMonth', checks, 'opening the year picker without the month picker');
+        phase('year picker opened directly', [...checks, ...inspect(document, { monthOpen: false, yearOpen: true })]);
+    }
+
+    {
+        const { document } = newCalendar();
+        const checks = [];
+        press(document, '.cw___monthChange', checks, 'opening the month picker');
+
+        const wanted = (spec.month + 7) % 12;
+        const button = document.querySelectorAll('.cw___monthButton')
+            .find(candidate => Number(candidate.getAttribute('data-month')) === wanted) ?? null;
+        if (button === null) {
+            checks.push({
+                name: 'pickerControlPresent',
+                ok: false,
+                detail: `no month button carries data-month ${wanted}`,
+                skipped: false
+            });
+            harness.push(`month pick: no button carries data-month ${wanted}`);
+        } else {
+            button.dispatchEvent({ type: 'click', target: button });
+
+            const caption = document.querySelector('.cw___monthChange');
+            const drawn = caption === null ? '' : caption.textContent;
+            const marked = document.querySelectorAll('td.cw___day').length;
+            const days = new Date(pivot, wanted + 1, 0).getDate();
+            checks.push({
+                name: 'monthPickApplies',
+                ok: drawn === `${spec.monthNames[wanted]} ${pivot}` && marked === days,
+                detail: `picked month ${wanted}: caption reads "${drawn}", expected`
+                    + ` "${spec.monthNames[wanted]} ${pivot}"; ${marked} day cells marked for a ${days} day month`
+            });
+
+            const monthPicker = document.querySelector('.cw___picker--month');
+            const yearPicker = document.querySelector('.cw___picker--year');
+            checks.push({
+                name: 'monthPickCloses',
+                ok: monthPicker !== null && yearPicker !== null
+                    && !pickerIsOpen(monthPicker) && !pickerIsOpen(yearPicker),
+                detail: `month picker ${monthPicker === null ? 'missing' : pickerIsOpen(monthPicker) ? 'open' : 'closed'},`
+                    + ` year picker ${yearPicker === null ? 'missing' : pickerIsOpen(yearPicker) ? 'open' : 'closed'}`
+            });
+
+            press(document, '.cw___monthChange', checks, 'reopening the month picker after a month pick');
+            checks.push(...inspect(document));
+        }
+
+        phase('month button click', checks);
+    }
+
+    {
+        const { document } = newCalendar();
+        const checks = [];
+        press(document, '.cw___monthChange', checks, 'opening the month picker');
+        press(document, '.cw___captionMonth', checks, 'opening the year picker');
+
+        /* The fourth year button, expected at `pivot − 4` — an index the checker derives, not
+           one it reads back from the attribute it is checking. */
+        const index = 3;
+        const wanted = first + index;
+        const button = document.querySelectorAll('.cw___yearButton')[index] ?? null;
+        if (button === null) {
+            checks.push({
+                name: 'pickerControlPresent',
+                ok: false,
+                detail: `the year picker has no button at index ${index}`,
+                skipped: false
+            });
+            harness.push(`year pick: no year button at index ${index}`);
+        } else {
+            button.dispatchEvent({ type: 'click', target: button });
+
+            const yearPicker = document.querySelector('.cw___picker--year');
+            checks.push({
+                name: 'yearPickCloses',
+                ok: yearPicker !== null && !pickerIsOpen(yearPicker),
+                detail: `year picker ${yearPicker === null ? 'missing' : pickerIsOpen(yearPicker) ? 'open' : 'closed'}`
+                    + ` after clicking the button reading "${button.textContent}"`
+            });
+
+            const after = readPickerState(document);
+            checks.push({
+                name: 'yearPickApplies',
+                ok: after.month === String(wanted)
+                    && after.first === wanted - PICKER_YEARS_BEFORE
+                    && after.last === wanted + PICKER_YEARS_AFTER,
+                detail: `clicked the button reading "${button.textContent}": captions now read`
+                    + ` "${after.month}" and "${after.range}", expected "${wanted}" and`
+                    + ` ${wanted - PICKER_YEARS_BEFORE} … ${wanted + PICKER_YEARS_AFTER}`
+            });
+
+            press(document, '.cw___monthChange', checks, 'reopening the month picker after a year pick');
+            checks.push(...inspect(document, { pivot: wanted }));
+        }
+
+        phase('year button click', checks);
+    }
+
+    for (const [which, sides] of [
+        ['month', ['left', 'left', 'right', 'right', 'right']],
+        ['year', ['right', 'right', 'left', 'left']]
+    ]) {
+        /* One year for the month picker's arrows, the whole width of the year range for the
+           year picker's — the step inherited from the legacy code and easy to get wrong. */
+        const step = which === 'month' ? 1 : PICKER_YEAR_BUTTONS;
+        const { document } = newCalendar();
+        const checks = [];
+        press(document, '.cw___monthChange', checks, `opening the month picker before paging the ${which} picker`);
+        if (which === 'year') {
+            press(document, '.cw___captionMonth', checks, 'opening the year picker');
+        }
+
+        const arrows = pickerArrows(document, which);
+        let expected = pivot;
+        for (const side of sides) {
+            const arrow = side === 'left' ? arrows.left : arrows.right;
+            if (arrow === null) {
+                checks.push({
+                    name: 'pickerControlPresent',
+                    ok: false,
+                    detail: `the ${which} picker has no ${side} arrow`,
+                    skipped: false
+                });
+                harness.push(`${which} picker: no ${side} arrow`);
+                continue;
+            }
+
+            arrow.dispatchEvent({ type: 'click', target: arrow });
+            expected += side === 'left' ? -step : step;
+            const after = readPickerState(document);
+            checks.push({
+                name: `${which}ArrowStep`,
+                ok: after.month === String(expected)
+                    && after.first === expected - PICKER_YEARS_BEFORE
+                    && after.last === expected + PICKER_YEARS_AFTER
+                    && after.years.length === PICKER_YEAR_BUTTONS
+                    && after.years[0] === String(expected - PICKER_YEARS_BEFORE)
+                    && after.years.at(-1) === String(expected + PICKER_YEARS_AFTER),
+                detail: `the ${which} picker ${side} arrow moved the pivot to ${expected}:`
+                    + ` caption "${after.month}", range "${after.range}",`
+                    + ` data-year ${preview(after.years, 2)}…${preview(after.years.slice(-1))}`
+            });
+        }
+
+        checks.push(...inspect(document, { pivot: expected, yearOpen: which === 'year' }));
+        phase(`${which} picker arrows`, checks);
+    }
+
+    {
+        const { document, calendar } = newCalendar();
+        const checks = [];
+        calendar.setDateSelect(spec.year, spec.month, day);
+        press(document, '.cw___monthChange', checks, 'opening the month picker over a selection');
+        checks.push(...inspect(document, { selection }));
+
+        press(document, '.cw___captionMonth', checks, 'opening the year picker over a selection');
+        checks.push(...inspect(document, { selection, yearOpen: true }));
+
+        /* Two widths of the year range take the selected year off screen; the marks have to go
+           with it rather than stay behind on a stale button. */
+        const right = pickerArrows(document, 'year').right;
+        if (right === null) {
+            checks.push({
+                name: 'pickerControlPresent',
+                ok: false,
+                detail: 'the year picker has no right arrow',
+                skipped: false
+            });
+            harness.push('selection marks: no right arrow on the year picker');
+        } else {
+            for (let width = 0; width < 2; width++) {
+                right.dispatchEvent({ type: 'click', target: right });
+            }
+            const paged = pivot + PICKER_YEAR_BUTTONS * 2;
+            const after = readPickerState(document);
+            checks.push({
+                name: 'selectionPagedOut',
+                ok: after.month === String(paged) && !after.years.includes(String(pivot)),
+                detail: `the pivot reads "${after.month}" after two presses, expected "${paged}";`
+                    + ` data-year ${preview(after.years, 2)}…${preview(after.years.slice(-1))}`
+            });
+            checks.push(...inspect(document, { pivot: paged, selection, yearOpen: true }));
+        }
+
+        phase('selection marks', checks);
+    }
+
+    {
+        const { document, calendar } = newCalendar();
+        const checks = [];
+        calendar.setDateSelect(spec.year, spec.month, day);
+        calendar.resetDateSelect();
+
+        const cleared = calendar.getDateSelect();
+        checks.push({
+            name: 'selectionCleared',
+            ok: cleared.year === '0' && cleared.month === '01' && cleared.day === '00',
+            detail: `getDateSelect reads ${cleared.year}.${cleared.month}.${cleared.day}`
+                + ` after resetDateSelect, expected 0.01.00`
+        });
+
+        press(document, '.cw___monthChange', checks, 'opening the month picker after the selection was cleared');
+        checks.push(...inspect(document));
+
+        press(document, '.cw___captionMonth', checks, 'opening the year picker after the selection was cleared');
+        checks.push(...inspect(document, { yearOpen: true }));
+
+        phase('cleared selection', checks);
+    }
+
+    /* Every path that can reach the year picker has to leave the same captions behind: the
+       paths a real pointer can take, plus the one no pointer can and the opener still has to
+       survive — a root nothing has repainted since it was built. */
+    {
+        const paths = [
+            ['through the month picker', (document, calendar, checks) => {
+                press(document, '.cw___monthChange', checks, 'month caption');
+                press(document, '.cw___captionMonth', checks, 'year caption');
+            }],
+            ['straight from the year caption', (document, calendar, checks) => {
+                press(document, '.cw___captionMonth', checks, 'year caption');
+            }],
+            ['after a day click', (document, calendar, checks) => {
+                const cell = findCell(document, spec.year, spec.month, day);
+                if (cell === null) {
+                    checks.push({
+                        name: 'pickerControlPresent',
+                        ok: false,
+                        detail: `no cell carries data-date ${spec.year}.${spec.month}.${day}`,
+                        skipped: false
+                    });
+                    harness.push(`open paths: no cell for ${spec.year}.${spec.month}.${day}`);
+                    return;
+                }
+                cell.dispatchEvent({ type: 'click', target: cell });
+                /* The day click leaves a selection behind, which legitimately marks a button;
+                   clearing it keeps the comparison about the captions alone. */
+                calendar.resetDateSelect();
+                press(document, '.cw___monthChange', checks, 'month caption');
+                press(document, '.cw___captionMonth', checks, 'year caption');
+            }],
+            ['after a month button click', (document, calendar, checks) => {
+                press(document, '.cw___monthChange', checks, 'month caption');
+                const wanted = (spec.month + 7) % 12;
+                const button = document.querySelectorAll('.cw___monthButton')
+                    .find(candidate => Number(candidate.getAttribute('data-month')) === wanted) ?? null;
+                if (button === null) {
+                    checks.push({
+                        name: 'pickerControlPresent',
+                        ok: false,
+                        detail: `no month button carries data-month ${wanted}`,
+                        skipped: false
+                    });
+                    harness.push(`open paths: no button for month ${wanted}`);
+                    return;
+                }
+                button.dispatchEvent({ type: 'click', target: button });
+                press(document, '.cw___monthChange', checks, 'month caption');
+                press(document, '.cw___captionMonth', checks, 'year caption');
+            }]
+        ];
+
+        const seen = [];
+        for (const [label, drive] of paths) {
+            const { document, calendar } = newCalendar();
+            const checks = [];
+            drive(document, calendar, checks);
+            const after = readPickerState(document);
+            seen.push({
+                label,
+                checks,
+                signature: `${after.month} | ${after.range} | ${after.years.join(',')}`
+            });
+        }
+
+        const [reference, ...rest] = seen;
+        const checks = rest.flatMap(entry => {
+            entry.checks.push({
+                name: 'openPathCaptionsMatch',
+                ok: entry.signature === reference.signature,
+                detail: `opened ${entry.label}: "${entry.signature}";`
+                    + ` opened ${reference.label}: "${reference.signature}"`
+            });
+            return entry.checks;
+        });
+        checks.push({
+            name: 'openPathCaptionsPopulated',
+            ok: seen.every(entry => readRangeCaption(entry.signature.split(' | ')[1]).first !== null),
+            detail: seen.map(entry => `${entry.label} -> "${entry.signature.split(' | ')[1]}"`).join('; ')
+        });
+
+        phase('open paths', checks);
+    }
+
+    return { phases, harness, branches };
+}
+
+/**
+ * Injects six defects into a live picker state and insists the checker reports each, so a run
+ * that cannot fail cannot be reported as green.
+ *
+ * Each injection writes into the very node the invariant under test reads, and is read back to
+ * confirm it changed something: an injection into a node that already held the value would land
+ * invisibly and leave the assertion it was meant to disqualify looking perfectly sensitive.
+ * The baseline is therefore required to be empty — an invariant that was already failing would
+ * mask every injection aimed at it.
+ *
+ * The state is the one a real pointer leaves behind most often: the month overlay open over a
+ * selection, the year overlay closed but already repainted by the same update.
+ *
+ * @param {{Calendar: Function, freshDocument: () => StubDocument}} runtime
+ * @param {CaseSpec} spec
+ * @returns {{baseline: string[], marks: {name: string, extra: string[], landed: boolean}[], landed: boolean}}
+ */
+function canaryPicker(runtime, spec) {
+    const document = runtime.freshDocument();
+    const { calendar } = mount(document, runtime.Calendar, spec);
+    const selection = { year: spec.year, month: spec.month };
+    calendar.setDateSelect(spec.year, spec.month, Math.min(15, new Date(spec.year, spec.month + 1, 0).getDate()));
+    const gridCaption = document.querySelector('.cw___monthChange');
+    gridCaption.dispatchEvent({ type: 'click', target: gridCaption });
+
+    const inspect = () => inspectPickers({
+        document,
+        pivot: spec.year,
+        selection,
+        monthOpen: true,
+        yearOpen: false,
+        monthNames: spec.monthNames
+    });
+    const baseline = inspect().filter(check => !check.ok).map(check => check.name);
+
+    /**
+     * @param {string} name
+     * @param {() => boolean} apply writes the defect, returns whether it landed
+     * @param {() => void} revert
+     */
+    const inject = (name, apply, revert) => {
+        const landed = apply();
+        const extra = inspect().filter(check => !check.ok).map(check => check.name)
+            .filter(failing => !baseline.includes(failing));
+        revert();
+        return { name, extra, landed };
+    };
+
+    const index = 5;
+    const yearButton = document.querySelectorAll('.cw___yearButton')[index];
+    const yearCaption = document.querySelector('.cw___captionYear');
+    const monthCaption = document.querySelector('.cw___captionMonth');
+    const yearRange = yearCaption.textContent;
+    const monthRange = monthCaption.textContent;
+    const yearWas = yearButton.getAttribute('data-year');
+    const yearPicker = document.querySelector('.cw___picker--year');
+    const otherYear = document.querySelectorAll('.cw___yearButton')[2];
+    const otherMonth = document.querySelectorAll('.cw___monthButton')[1];
+
+    const marks = [
+        /* The pre-`#updatePicker` encoding: a button addressed by its own index. */
+        inject('data-year forced back to its index',
+            () => {
+                yearButton.setAttribute('data-year', String(index));
+                return yearWas !== String(index) && yearButton.getAttribute('data-year') === String(index);
+            },
+            () => yearButton.setAttribute('data-year', yearWas)),
+        inject('year range caption blanked',
+            () => {
+                yearCaption.textContent = DORMANT_CAPTION;
+                return yearRange !== DORMANT_CAPTION && yearCaption.textContent === DORMANT_CAPTION;
+            },
+            () => {
+                yearCaption.textContent = yearRange;
+            }),
+        inject('month caption blanked',
+            () => {
+                monthCaption.textContent = DORMANT_CAPTION;
+                return monthRange !== DORMANT_CAPTION && monthCaption.textContent === DORMANT_CAPTION;
+            },
+            () => {
+                monthCaption.textContent = monthRange;
+            }),
+        inject('cw___picker--open forced onto the closed year overlay',
+            () => {
+                const was = pickerIsOpen(yearPicker);
+                yearPicker.classList.add(PICKER_OPEN);
+                return !was && pickerIsOpen(yearPicker);
+            },
+            () => yearPicker.classList.remove(PICKER_OPEN)),
+        inject('cw___selectedYear forced onto a second year button',
+            () => {
+                otherYear.classList.add('cw___selectedYear');
+                return document.querySelectorAll('.cw___selectedYear').length === 2;
+            },
+            () => otherYear.classList.remove('cw___selectedYear')),
+        inject('cw___selectedMonth forced onto a second month button',
+            () => {
+                otherMonth.classList.add('cw___selectedMonth');
+                return document.querySelectorAll('.cw___selectedMonth').length === 2;
+            },
+            () => otherMonth.classList.remove('cw___selectedMonth'))
+    ];
+
+    return { baseline, marks, landed: marks.every(mark => mark.landed) };
+}
+
+/**
+ * Both mark branches have to be reached, or an expectation of "no mark" would keep passing
+ * simply because no state ever asked for one.
+ *
+ * @param {ReturnType<typeof runPickerCase>[]} outcomes
+ * @returns {{ok: boolean, detail: string}}
+ */
+function assertPickerBranchCoverage(outcomes) {
+    const tally = outcomes.reduce((sum, outcome) => {
+        for (const [branch, count] of Object.entries(outcome.branches)) {
+            sum[branch] += count;
+        }
+        return sum;
+    }, { monthMark: 0, noMonthMark: 0, yearMark: 0, noYearMark: 0 });
+
+    const reached = Object.values(tally).every(count => count > 0);
+    return {
+        ok: reached,
+        detail: `cw___selectedMonth expected in ${tally.monthMark} states and absent in ${tally.noMonthMark};`
+            + ` cw___selectedYear expected in ${tally.yearMark} states and absent in ${tally.noYearMark};`
+            + ` month arrows stepped by 1 and year arrows by ${PICKER_YEAR_BUTTONS}`
+    };
+}
+
+/**
+ * @param {{Calendar: Function, freshDocument: () => StubDocument}} runtime
+ * @returns {{specs: CaseSpec[], cases: {label: string, checks: CheckResult[]}[], canary: ReturnType<typeof canaryPicker>, harnessProblems: string[], coverage: {ok: boolean, detail: string}}}
+ */
+function runPickerMatrix(runtime) {
+    const specs = [];
+    for (const year of PICKER_YEARS) {
+        for (const month of PICKER_MONTHS) {
+            for (const mode of MODES) {
+                specs.push({ year, month, weekStartsOnMonday: true, mode, locale: SYNTHETIC_LOCALE, monthNames: MONTH_NAMES, weekdayNames: WEEKDAYS_SHORT });
+            }
+        }
+    }
+
+    const harnessProblems = [];
+    const cases = [];
+    const outcomes = [];
+    for (const spec of specs) {
+        const label = `${spec.year}-${String(spec.month + 1).padStart(2, '0')} ${spec.mode} picker`;
+        const outcome = runPickerCase(runtime, spec);
+        outcomes.push(outcome);
+        harnessProblems.push(...outcome.harness.map(problem => `${label}: ${problem}`));
+        for (const { label: phaseLabel, checks } of outcome.phases) {
+            cases.push({ label: `${label} / ${phaseLabel}`, checks });
+        }
+    }
+
+    const canarySpec = { year: 2026, month: 10, weekStartsOnMonday: true, mode: 'inline', locale: SYNTHETIC_LOCALE, monthNames: MONTH_NAMES, weekdayNames: WEEKDAYS_SHORT };
+    return {
+        specs,
+        cases,
+        canary: canaryPicker(runtime, canarySpec),
+        harnessProblems,
+        coverage: assertPickerBranchCoverage(outcomes)
+    };
+}
+
 /* ------------------------------------------------------------------------- report */
 
 /**
  * @param {ReturnType<typeof runMatrix>} matrix
+ * @param {ReturnType<typeof runPickerMatrix>} pickers
  * @param {string} sourceLabel
  * @returns {{text: string, exitCode: number}}
  */
-function report(matrix, sourceLabel) {
+function report(matrix, pickers, sourceLabel) {
     const lines = [];
     const invariants = [...new Set(matrix.cases.flatMap(entry => entry.checks.map(check => check.name)))]
         .sort((left, right) => (left < right ? -1 : 1));
@@ -901,6 +1667,12 @@ function report(matrix, sourceLabel) {
     const failedChecks = matrix.cases.reduce((sum, entry) => sum + entry.checks.filter(check => !check.ok).length, 0);
     const dayCellsRead = matrix.cases.length * 42;
 
+    const pickerInvariants = [...new Set(pickers.cases.flatMap(entry => entry.checks.map(check => check.name)))]
+        .sort((left, right) => (left < right ? -1 : 1));
+    const pickerChecks = pickers.cases.reduce((sum, entry) => sum + entry.checks.length, 0);
+    const pickerFailed = pickers.cases.reduce((sum, entry) => sum + entry.checks.filter(check => !check.ok).length, 0);
+    const pickerSkipped = pickers.cases.reduce((sum, entry) => sum + entry.checks.filter(check => check.skipped).length, 0);
+
     lines.push('== calendar grid regression check ==');
     lines.push(`source            ${sourceLabel}`);
     lines.push('harness           node:vm context + minimal DOM stub, real Calendar class, real click path');
@@ -908,6 +1680,8 @@ function report(matrix, sourceLabel) {
     lines.push(`renders inspected ${matrix.cases.length}`);
     lines.push(`day cells read    ${dayCellsRead}`);
     lines.push(`invariants        ${invariants.length} per render, ${totalChecks} checks (${skippedChecks} skipped)`);
+    lines.push(`picker states     ${pickers.cases.length} across ${pickers.specs.length} calendars`);
+    lines.push(`picker invariants ${pickerInvariants.length} per state, ${pickerChecks} checks (${pickerSkipped} skipped)`);
 
     lines.push('');
     lines.push('-- harness self-checks --');
@@ -923,6 +1697,7 @@ function report(matrix, sourceLabel) {
             + ` -> [${mark.extra.join(' ')}] (landed: ${mark.landed})`);
     }
     lines.push(`${matrix.coverage.ok ? 'ok  ' : 'FAIL'}  matrix coverage  ${matrix.coverage.detail}`);
+    lines.push(`${pickers.coverage.ok ? 'ok  ' : 'FAIL'}  picker coverage  ${pickers.coverage.detail}`);
     const transitions = matrix.harnessProblems.length === 0;
     lines.push(`${transitions ? 'ok  ' : 'FAIL'}  click path       ${transitions
         ? `all ${matrix.specs.length} clicks rebuilt the root, moved the selection and marked the clicked cell`
@@ -937,6 +1712,40 @@ function report(matrix, sourceLabel) {
         lines.push(`FAIL  click path       ${problem}`);
     }
 
+    /* The same rule for the pickers: each injected defect must land *and* be reported by the
+       invariant it was aimed at, which is what separates "the assertion ran" from "the
+       assertion cannot fail". */
+    const PICKER_CANARY_WANTED = [
+        ['data-year forced back to its index', 'yearButtonDataYear'],
+        ['year range caption blanked', 'yearPickerCaption'],
+        ['month caption blanked', 'monthPickerCaption'],
+        ['cw___picker--open forced onto the closed year overlay', 'pickerOpenState'],
+        ['cw___selectedYear forced onto a second year button', 'selectedYearMark'],
+        ['cw___selectedMonth forced onto a second month button', 'selectedMonthMark']
+    ];
+    const pickerCanaryOk = pickers.canary.baseline.length === 0
+        && pickers.canary.landed
+        && pickers.canary.marks.length === PICKER_CANARY_WANTED.length
+        && pickers.canary.marks.every((mark, index) => {
+            const wanted = PICKER_CANARY_WANTED[index][1];
+            return mark.name === PICKER_CANARY_WANTED[index][0] && mark.extra.includes(wanted);
+        });
+    for (const mark of pickers.canary.marks) {
+        lines.push(`${pickerCanaryOk ? 'ok  ' : 'FAIL'}  canary           picker: ${mark.name}`
+            + ` -> [${mark.extra.join(' ')}] (landed: ${mark.landed})`);
+    }
+    lines.push(`${pickerCanaryOk ? 'ok  ' : 'FAIL'}  canary baseline  picker: ${
+        pickers.canary.baseline.length === 0
+            ? 'the injected state holds before anything is broken into it'
+            : `already failing [${pickers.canary.baseline.join(' ')}], so no injection could be seen`}`);
+    const pickerPathsOk = pickers.harnessProblems.length === 0;
+    lines.push(`${pickerPathsOk ? 'ok  ' : 'FAIL'}  picker paths     ${pickerPathsOk
+        ? `every picker control of all ${pickers.cases.length} states was found and clicked`
+        : `${pickers.harnessProblems.length} picker controls were missing`}`);
+    for (const problem of pickers.harnessProblems.slice(0, 5)) {
+        lines.push(`FAIL  picker paths     ${problem}`);
+    }
+
     lines.push('');
     lines.push('-- per-invariant results --');
     for (const name of invariants) {
@@ -944,6 +1753,38 @@ function report(matrix, sourceLabel) {
         const failures = matrix.cases.filter(entry => entry.checks
             .some(check => check.name === name && !check.ok));
         lines.push(`${failures.length === 0 ? 'pass' : 'FAIL'}  ${name.padEnd(20)} ${failures.length}/${runs.length} renders`);
+    }
+
+    lines.push('');
+    lines.push('-- per-invariant results, pickers --');
+    for (const name of pickerInvariants) {
+        const runs = pickers.cases.filter(entry => entry.checks.some(check => check.name === name));
+        const failures = pickers.cases.filter(entry => entry.checks
+            .some(check => check.name === name && !check.ok));
+        lines.push(`${failures.length === 0 ? 'pass' : 'FAIL'}  ${name.padEnd(24)} ${failures.length}/${runs.length} states`);
+    }
+
+    lines.push('');
+    lines.push('-- picker states by phase --');
+    for (const phase of [...new Set(pickers.cases.map(entry => entry.label.split(' / ')[1]))]) {
+        const runs = pickers.cases.filter(entry => entry.label.endsWith(` / ${phase}`));
+        const failures = runs.filter(entry => entry.checks.some(check => !check.ok));
+        lines.push(`${failures.length === 0 ? 'pass' : 'FAIL'}  ${phase.padEnd(24)} ${failures.length}/${runs.length} states`);
+    }
+
+    const failingPickerStates = pickers.cases.filter(entry => entry.checks.some(check => !check.ok));
+    lines.push('');
+    lines.push(`-- failing picker states (${failingPickerStates.length}) --`);
+    const shownPicker = new Set();
+    for (const entry of failingPickerStates) {
+        if (shownPicker.has(entry.label)) {
+            continue;
+        }
+        shownPicker.add(entry.label);
+        lines.push(`  ${entry.label}`);
+        for (const check of entry.checks.filter(failing => !failing.ok)) {
+            lines.push(`      ${check.name}: ${check.detail}`);
+        }
     }
 
     lines.push('');
@@ -1009,13 +1850,18 @@ function report(matrix, sourceLabel) {
         && canaryOk
         && matrix.coverage.ok
         && transitions
-        && matrix.harnessProblems.length === 0;
+        && matrix.harnessProblems.length === 0
+        && pickerFailed === 0
+        && pickerCanaryOk
+        && pickers.coverage.ok
+        && pickerPathsOk;
 
     lines.push('');
-    lines.push(`checks ${totalChecks}, failed ${failedChecks}`);
+    lines.push(`checks ${totalChecks + pickerChecks}, failed ${failedChecks + pickerFailed}`
+        + `  (grid ${totalChecks}/${failedChecks}, pickers ${pickerChecks}/${pickerFailed})`);
     lines.push(green
         ? 'RESULT: PASS'
-        : `RESULT: FAIL (${failedChecks} failed checks, exit 1)`);
+        : `RESULT: FAIL (${failedChecks + pickerFailed} failed checks, exit 1)`);
 
     return { text: `${lines.join('\n')}\n`, exitCode: green ? 0 : 1 };
 }
@@ -1025,7 +1871,8 @@ function report(matrix, sourceLabel) {
 try {
     const runtime = createRuntime(SOURCE_PATH, SOURCE_LABEL);
     const matrix = runMatrix(runtime);
-    const result = report(matrix, SOURCE_LABEL);
+    const pickers = runPickerMatrix(runtime);
+    const result = report(matrix, pickers, SOURCE_LABEL);
     process.stdout.write(result.text);
     process.exitCode = result.exitCode;
 } catch (error) {
