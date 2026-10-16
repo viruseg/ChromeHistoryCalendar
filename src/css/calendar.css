@@ -8,7 +8,7 @@
     top: 0;
 }
 
-.cw___calendar .cw___hide, .cw___hide {
+.cw___hide {
     display: none;
 }
 
@@ -189,7 +189,7 @@
     top: .55em;
 }
 
-.cw___monthButton, .cw___yearButton {
+.cw___calendar .cw___monthButton, .cw___calendar .cw___yearButton {
     width: 6.7em;
     float: left;
     font-size: 1.7em;

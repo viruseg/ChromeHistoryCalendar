@@ -22,9 +22,9 @@ the drawn month, spill cells genuinely outside it, and `data-date` values that n
 dates. Each case is inspected twice — as the constructor renders it, and after a day click has been
 dispatched through the delegated handler. Exits non-zero on any failure.
 
-Run it after touching `src/js/calendar.js`. It is deliberately expected to fail on the string month
-`#selectDay` leaves behind (`this.#month = String(month)` makes `this.#month + 1` string
-concatenation); that fix is tracked separately.
+Run it after touching `src/js/calendar.js`. It is expected to pass (`checks 8448, failed 0`, exit 0).
+It only covers the grid: the harness never opens a picker, so the picker captions, the year
+buttons' `data-year`, locale merging and popup positioning are not checked by it.
 
 ## Debugging via MCP
 
